@@ -3,8 +3,10 @@ package io.daiwei.rpc.main;
 import io.daiwei.rpc.demo.service.impl.UserServiceImpl;
 import io.daiwei.rpc.pojo.RpcFxReq;
 import io.daiwei.rpc.pojo.RpcFxResp;
+import io.daiwei.rpc.resolver.AnnotationFindResolver;
 import io.daiwei.rpc.resolver.MapServiceResolver;
 import io.daiwei.rpc.skeleton.RpcSkeletonServerStub;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -27,9 +29,14 @@ public class RpcDemoServerMain {
 
     @Bean
     public RpcSkeletonServerStub stub() {
-        RpcSkeletonServerStub rpcServerStub = new RpcSkeletonServerStub(new MapServiceResolver());
-        rpcServerStub.register(new UserServiceImpl());
-        return rpcServerStub;
+//        RpcSkeletonServerStub rpcServerStub = new RpcSkeletonServerStub(new MapServiceResolver());
+//        rpcServerStub.register(new UserServiceImpl());
+//        return rpcServerStub;
+
+        AnnotationFindResolver findResolver = new AnnotationFindResolver("io.daiwei.rpc");
+        RpcSkeletonServerStub serverStub = new RpcSkeletonServerStub(findResolver);
+        findResolver.register();
+        return serverStub;
     }
 
     @Resource

@@ -1,7 +1,7 @@
 package io.daiwei.rpc.stub;
 
 import com.alibaba.fastjson.parser.ParserConfig;
-import io.daiwei.rpc.api.RpcCgLibInvokeHandler;
+import io.daiwei.rpc.api.RpcInvokeHandler;
 
 /**
  * Created by Daiwei on 2021/3/20
@@ -12,13 +12,13 @@ public class RpcInvokerFactory {
         ParserConfig.getGlobalInstance().addAccept("io.daiwei");
     }
 
-    private RpcCgLibInvokeHandler rpcInvokeHandler;
+    private RpcInvokeHandler invokeHandler;
 
-    public RpcInvokerFactory(RpcCgLibInvokeHandler handler) {
-        this.rpcInvokeHandler = handler;
+    public RpcInvokerFactory(RpcInvokeHandler handler) {
+        this.invokeHandler = handler;
     }
 
     public <T> T createStub(Class<T> clazz) {
-        return this.rpcInvokeHandler.create(clazz);
+        return this.invokeHandler.create(clazz);
     }
 }

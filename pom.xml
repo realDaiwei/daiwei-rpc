@@ -9,10 +9,9 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>rpc-core</module>
-        <module>rpc-io.daiwei.rpc.demo-server</module>
-        <module>rpc-io.daiwei.rpc.demo-client</module>
-        <module>rpc-common</module>
-        <module>rpc-io.daiwei.rpc.demo-common</module>
+        <module>rpc-demo-server</module>
+        <module>rpc-demo-client</module>
+        <module>rpc-demo-common</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -26,7 +25,9 @@
         <log.version>1.2.17</log.version>
         <fastjson.version>1.2.70</fastjson.version>
         <cglib.version>3.2.4</cglib.version>
-
+        <reflect.version>0.9.11</reflect.version>
+        <guava.version>29.0-jre</guava.version>
+        <bytebuddy.version>1.10.20</bytebuddy.version>
     </properties>
 
     <dependencyManagement>
@@ -70,6 +71,21 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-web</artifactId>
                 <version>${springboot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>${reflect.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${bytebuddy.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

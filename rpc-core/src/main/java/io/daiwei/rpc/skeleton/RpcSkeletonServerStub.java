@@ -32,10 +32,6 @@ public class RpcSkeletonServerStub {
         return resp;
     }
 
-    public void register(Object obj) {
-        Arrays.stream(obj.getClass().getInterfaces()).forEach(o -> resolver.register(o.getName(), obj));
-    }
-
     private Method findMethodFromClazz(Class<?> clazz, String method) {
         return Arrays.stream(clazz.getMethods()).filter(m -> m.getName().equals(method)).findFirst().orElse(null);
     }

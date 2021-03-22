@@ -7,6 +7,8 @@ public interface RpcTargetResolver {
 
     Object resolve(String clazzName);
 
-    void register(String name, Object service);
+    default void register(String name, Object service) {}
+
+    default void register() {}
 
 }
