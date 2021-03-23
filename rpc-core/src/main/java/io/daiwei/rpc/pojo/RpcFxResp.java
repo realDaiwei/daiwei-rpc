@@ -1,5 +1,6 @@
 package io.daiwei.rpc.pojo;
 
+import io.daiwei.rpc.constant.RpcConstant;
 import lombok.Data;
 
 /**
@@ -17,14 +18,14 @@ public class RpcFxResp {
     public static RpcFxResp ok(Object data) {
         RpcFxResp resp = new RpcFxResp();
         resp.setData(data);
-        resp.setCode(0);
+        resp.setCode(RpcConstant.SUCCESS);
         return resp;
     }
 
     public static RpcFxResp fail(Exception e) {
         RpcFxResp resp = new RpcFxResp();
         resp.setException(e);
-        resp.setCode(-1);
+        resp.setCode(RpcConstant.FAILED);
         return resp;
     }
 }

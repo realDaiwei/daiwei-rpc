@@ -9,5 +9,7 @@ public class RpcConstant {
 
     public static final int SUCCESS = 0;
 
-    private static final int FAILED = -1;
+    public static final int FAILED = -1;
+
+    public static final long CACHE_EXPIRE = 5 * 60L;
 }

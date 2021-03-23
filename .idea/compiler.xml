@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="rpc-demo-common" />
+        <module name="rpc-demo-client" />
+        <module name="rpc-core" />
+        <module name="rpc-demo-server" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="daiwei-rpc" target="8" />
+      <module name="rpc-core" target="8" />
+      <module name="rpc-demo-client" target="8" />
+      <module name="rpc-demo-common" target="8" />
+      <module name="rpc-demo-server" target="8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

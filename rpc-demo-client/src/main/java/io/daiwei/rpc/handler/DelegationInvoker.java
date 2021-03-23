@@ -21,7 +21,6 @@ import java.lang.reflect.Method;
  */
 public class DelegationInvoker {
 
-
     @RuntimeType
     public Object intercept(@This Object target, @AllArguments Object[] args, @Origin Method method) {
         Class<?> proxyClass = target.getClass().getInterfaces()[0];

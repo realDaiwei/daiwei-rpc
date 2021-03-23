@@ -32,7 +32,6 @@ public class RpcDemoServerMain {
 //        RpcSkeletonServerStub rpcServerStub = new RpcSkeletonServerStub(new MapServiceResolver());
 //        rpcServerStub.register(new UserServiceImpl());
 //        return rpcServerStub;
-
         AnnotationFindResolver findResolver = new AnnotationFindResolver("io.daiwei.rpc");
         RpcSkeletonServerStub serverStub = new RpcSkeletonServerStub(findResolver);
         findResolver.register();

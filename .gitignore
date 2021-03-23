@@ -3,7 +3,9 @@
 # Compiled class file
 *.class
 *.iml
-
+*/target
+.idea
+.gitidea
 # Log file
 *.log
 
