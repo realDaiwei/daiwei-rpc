@@ -24,4 +24,6 @@ public class RpcFxReq {
 
     private Object[] args;
 
+//    private Class<?>[] classArgs;
+
 }

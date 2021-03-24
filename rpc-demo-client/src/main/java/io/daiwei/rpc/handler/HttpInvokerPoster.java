@@ -20,7 +20,7 @@ public class HttpInvokerPoster {
     private static final MediaType mediaType = MediaType.get("application/json; charset=utf-8");
 
     public static RpcFxResp post(RpcFxReq rpcFxReq) throws IOException {
-        String url = "http://127.0.0.1:8080";
+        String url = "http://127.0.0.1:7248";
         String reqJson = JSON.toJSONString(rpcFxReq);
         final Request request = new Request.Builder()
                 .url(url).post(RequestBody.create(reqJson, mediaType))
