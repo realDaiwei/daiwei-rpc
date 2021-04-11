@@ -1,5 +1,6 @@
 package io.daiwei.rpc.stub.net.params;
 
+import io.daiwei.rpc.util.ThreadPoolUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.ExecutionException;
@@ -49,28 +50,28 @@ public class RpcFutureResp implements Future<RpcResponse> {
 
     @Override
     public RpcResponse get() throws InterruptedException, ExecutionException {
-        try {
-            get(0, TimeUnit.MILLISECONDS);
-        } catch (TimeoutException e) {
-            e.printStackTrace();
-        }
+        get(5000, TimeUnit.MILLISECONDS);
         return resp;
     }
 
     @Override
-    public RpcResponse get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+    public RpcResponse get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException {
         try {
             lock.lock();
             while (!isDone()) {
-               if (timeout <= 0) timeout = 0;
-                boolean await = fin.await(timeout, unit);
-                if (!await || isDone()) {
-                   break;
+               if (timeout <= 0) {
+                   fin.await();
+               } else {
+                   boolean await = fin.await(timeout, unit);
+                   if (!await || isDone()) {
+                       break;
+                   }
                }
             }
             if (!isDone()) {
-                log.error("daiwei-rpc process timeout.");
-                throw new TimeoutException("invoke timeout");
+                log.error("daiwei-rpc invoke timeout.");
+                resp = new RpcResponse();
+                resp.setException(new TimeoutException("inoke timeout"));
             }
         } finally {
             lock.unlock();

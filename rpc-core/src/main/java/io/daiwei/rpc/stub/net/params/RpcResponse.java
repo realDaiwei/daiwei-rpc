@@ -14,5 +14,5 @@ public class RpcResponse  {
 
     private String msg;
 
-    private String exceptionMsg;
+    private Exception exception;
 }

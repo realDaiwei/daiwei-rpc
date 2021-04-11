@@ -1,4 +1,4 @@
-package java.stub.invoker.annotation;
+package io.daiwei.rpc.stub.invoker.annotation;
 
 /**
  * Created by Daiwei on 2021/3/28

@@ -38,7 +38,7 @@ public class InvokerUnit {
         clientCore.stopClientServer();
     }
 
-    public void start() throws Exception {
+    public void afterSetProperties() throws Exception {
         this.clientCore = clientClazz.newInstance();
         RpcSerializer serializer = serializerClazz.newInstance();
         this.clientCore.setSerializer(serializer);

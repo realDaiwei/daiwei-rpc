@@ -1,7 +1,5 @@
 package io.daiwei.rpc.stub.invoker.refbean;
 
-import io.daiwei.rpc.serializer.RpcSerializer;
-import io.daiwei.rpc.stub.invoker.RpcInvokerFactory;
 import io.daiwei.rpc.stub.invoker.component.InvokerUnit;
 import lombok.Data;
 import io.daiwei.rpc.stub.net.Client;

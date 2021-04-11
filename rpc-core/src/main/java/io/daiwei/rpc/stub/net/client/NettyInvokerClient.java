@@ -13,6 +13,7 @@ public class NettyInvokerClient extends InvokerClientCore {
 
     private final Lock lock = new ReentrantLock();
 
+
     @Override
     public Client getClient(String addr) {
         initClientServerIfAbsent(addr);

@@ -13,6 +13,10 @@ public abstract class ConnectServer {
 
     protected Channel channel;
 
+    protected String host;
+
+    protected Integer port;
+
     public abstract void init(String address);
 
     public abstract void close();
@@ -23,5 +27,8 @@ public abstract class ConnectServer {
 
     public abstract void sendAsync(RpcRequest request);
 
+    public abstract String toString();
+
+    public abstract void cleanStaticResource();
 
 }

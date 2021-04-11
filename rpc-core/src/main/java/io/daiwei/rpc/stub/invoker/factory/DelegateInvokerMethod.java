@@ -1,4 +1,4 @@
-package io.daiwei.rpc.stub.invoker;
+package io.daiwei.rpc.stub.invoker.factory;
 
 import io.daiwei.rpc.serializer.RpcSerializer;
 import io.daiwei.rpc.stub.net.Client;
@@ -25,6 +25,7 @@ public class DelegateInvokerMethod {
         this.client = client;
     }
 
+
     @RuntimeType
     public Object interceptor(@This Object target, @AllArguments Object[] args, @Origin Method method, @Super Object clazz) {
         Class<?> iface = target.getClass().getInterfaces()[0];
@@ -34,9 +35,16 @@ public class DelegateInvokerMethod {
         RpcFutureResp rpcFutureResp = client.sendAsync(request);
         try {
             RpcResponse rpcResponse = rpcFutureResp.get();
-            return method.getReturnType().cast(rpcResponse.getData());
+            if (rpcResponse.getException() != null) {
+                throw new ExecutionException(request.getClassName() + "invoke failed", rpcResponse.getException());
+            }
+            if (rpcResponse.getData() != null) {
+                return method.getReturnType().cast(rpcResponse.getData());
+            }
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
+        } finally {
+            client.cleanAfterInvoke(request);
         }
         return null;
     }

@@ -1,15 +1,14 @@
-package io.daiwei.rpc.stub.invoker;
+package io.daiwei.rpc.stub.invoker.factory;
 
+import io.daiwei.rpc.serializer.impl.DefaultSerializer;
 import io.daiwei.rpc.stub.invoker.component.InvokerUnit;
 import io.daiwei.rpc.stub.invoker.component.RegisterUnit;
 import io.daiwei.rpc.stub.invoker.refbean.RpcRefBean;
 import io.daiwei.rpc.stub.net.client.NettyInvokerClient;
+import io.daiwei.rpc.util.ThreadPoolUtil;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatchers;
-
-import java.util.LinkedList;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by Daiwei on 2021/3/28
@@ -19,6 +18,10 @@ public class RpcInvokerFactory {
     private InvokerUnit invokerUnit;
 
     private RegisterUnit registerUnit;
+
+    public RpcInvokerFactory() {
+        start();
+    }
 
     /**
      * 创建调用的 stub
@@ -40,13 +43,19 @@ public class RpcInvokerFactory {
     }
 
     public void start() {
-        this.invokerUnit = new InvokerUnit(null, NettyInvokerClient.class);
+        this.invokerUnit = new InvokerUnit(DefaultSerializer.class, NettyInvokerClient.class);
         this.registerUnit = null;
+        try {
+            this.invokerUnit.afterSetProperties();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
     }
 
     public void stop() {
         try {
             invokerUnit.stop();
+            ThreadPoolUtil.shutdownExistsPools();
         } catch (Exception e) {
             e.printStackTrace();
         }

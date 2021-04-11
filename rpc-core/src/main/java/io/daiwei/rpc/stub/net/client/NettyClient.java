@@ -29,4 +29,9 @@ public class NettyClient extends Client {
         connectServer.sendAsync(request);
         return resp;
     }
+
+    @Override
+    public void cleanAfterInvoke(RpcRequest request) {
+        respPool.remove(request.getRequestId());
+    }
 }
