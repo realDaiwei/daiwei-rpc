@@ -13,6 +13,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<String> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
         // TODO: 2021/4/11   provider 返回的
+        log.info("msg return~");
     }
 
     @Override

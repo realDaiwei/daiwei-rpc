@@ -3,6 +3,7 @@ package io.daiwei.rpc.stub.invoker;
 import io.daiwei.rpc.stub.invoker.component.InvokerUnit;
 import io.daiwei.rpc.stub.invoker.component.RegisterUnit;
 import io.daiwei.rpc.stub.invoker.refbean.RpcRefBean;
+import io.daiwei.rpc.stub.net.client.NettyInvokerClient;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatchers;
@@ -39,7 +40,8 @@ public class RpcInvokerFactory {
     }
 
     public void start() {
-        // 启动时候调用
+        this.invokerUnit = new InvokerUnit(null, NettyInvokerClient.class);
+        this.registerUnit = null;
     }
 
     public void stop() {
@@ -49,10 +51,5 @@ public class RpcInvokerFactory {
             e.printStackTrace();
         }
 
-    }
-
-    private void init(InvokerUnit invokerUnit, RegisterUnit registerUnit) {
-        this.invokerUnit = invokerUnit;
-        this.registerUnit = registerUnit;
     }
 }

@@ -19,7 +19,6 @@ public class DelegateInvokerMethod {
 
     private static final AtomicInteger id = new AtomicInteger();
 
-
     private final Client client;
 
     public DelegateInvokerMethod(Client client) {
@@ -30,7 +29,7 @@ public class DelegateInvokerMethod {
     public Object interceptor(@This Object target, @AllArguments Object[] args, @Origin Method method, @Super Object clazz) {
         Class<?> iface = target.getClass().getInterfaces()[0];
         RpcRequest request = RpcRequest.builder().requestId(String.valueOf(id.getAndIncrement()))
-                .methodName(method.getName()).classTypes(iface).createTimeMillis(System.currentTimeMillis())
+                .methodName(method.getName()).classType(iface).createTimeMillis(System.currentTimeMillis())
                 .params(args).className(iface.getCanonicalName()).build();
         RpcFutureResp rpcFutureResp = client.sendAsync(request);
         try {

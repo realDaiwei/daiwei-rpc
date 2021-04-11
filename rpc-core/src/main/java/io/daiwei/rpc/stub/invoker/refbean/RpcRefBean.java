@@ -21,6 +21,8 @@ public class RpcRefBean {
 
     private List<String> availAddr;
 
+    private String finalAddr;
+
     private String accessToken;
 
     private long timeout = 60;
@@ -32,6 +34,6 @@ public class RpcRefBean {
      * 初始化 序列化器
      */
     public void init(InvokerUnit invokerUnit) {
-
+        this.clientInstance = invokerUnit.getInvokeClient(finalAddr);
     }
 }

@@ -1,32 +1,22 @@
 package io.daiwei.rpc.stub.net.client;
 
 import io.daiwei.rpc.stub.net.Client;
-import io.daiwei.rpc.stub.net.common.ClientManger;
-import io.daiwei.rpc.stub.net.common.ConnectServer;
-import io.daiwei.rpc.stub.net.params.RpcFutureResp;
+import io.daiwei.rpc.stub.net.common.InvokerClientCore;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by Daiwei on 2021/4/10
  */
-public class NettyClientManager extends ClientManger {
+public class NettyInvokerClient extends InvokerClientCore {
 
     private final Lock lock = new ReentrantLock();
-
-    public NettyClientManager() {
-        this.clientServers = new ConcurrentHashMap<>();
-    }
 
     @Override
     public Client getClient(String addr) {
         initClientServerIfAbsent(addr);
-        ConnectServer connectServer = this.clientServers.get(addr);
-        RpcFutureResp resp = new RpcFutureResp();
-        // 注册到回掉池
-        return null;
+        return new NettyClient(this.clientServers.get(addr), respPool);
     }
 
     private void initClientServerIfAbsent(String addr) {
@@ -34,8 +24,10 @@ public class NettyClientManager extends ClientManger {
             return;
         }
         setIfLockAbsent(addr);
-        Object lock = this.lockMap.get(addr);
-        synchronized (lock) {
+        synchronized (this.lockMap.get(addr)) {
+            if (this.clientServers.containsKey(addr)) {
+                return;
+            }
             NettyClientServer clientServer = new NettyClientServer(this.serializer);
             // 初始化一个client 客户端
             clientServer.init(addr);

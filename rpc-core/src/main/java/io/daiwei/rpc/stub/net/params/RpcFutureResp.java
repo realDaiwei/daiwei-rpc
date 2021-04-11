@@ -22,11 +22,11 @@ public class RpcFutureResp implements Future<RpcResponse> {
 
     private final Condition fin = lock.newCondition();
 
-    public void RespBell(RpcResponse resp) {
+    public void RespBellRing(RpcResponse resp) {
         this.resp = resp;
         try {
             lock.lock();
-
+            fin.signalAll();
         } finally {
             lock.unlock();
         }
