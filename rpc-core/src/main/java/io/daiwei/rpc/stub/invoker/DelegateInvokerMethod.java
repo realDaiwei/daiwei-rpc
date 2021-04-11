@@ -19,13 +19,11 @@ public class DelegateInvokerMethod {
 
     private static final AtomicInteger id = new AtomicInteger();
 
-    private final RpcSerializer serializer;
 
     private final Client client;
 
-    public DelegateInvokerMethod(RpcSerializer serializer, Client client) {
+    public DelegateInvokerMethod(Client client) {
         this.client = client;
-        this.serializer = serializer;
     }
 
     @RuntimeType
@@ -34,7 +32,7 @@ public class DelegateInvokerMethod {
         RpcRequest request = RpcRequest.builder().requestId(String.valueOf(id.getAndIncrement()))
                 .methodName(method.getName()).classTypes(iface).createTimeMillis(System.currentTimeMillis())
                 .params(args).className(iface.getCanonicalName()).build();
-        RpcFutureResp rpcFutureResp = client.sendAsync(request, this.serializer);
+        RpcFutureResp rpcFutureResp = client.sendAsync(request);
         try {
             RpcResponse rpcResponse = rpcFutureResp.get();
             return method.getReturnType().cast(rpcResponse.getData());

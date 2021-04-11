@@ -18,7 +18,7 @@ public class RpcRequest {
 
     private Object[] params;
 
-    private Class<?> classTypes;
+    private Class<?>[] classTypes;
 
     private long createTimeMillis;
 

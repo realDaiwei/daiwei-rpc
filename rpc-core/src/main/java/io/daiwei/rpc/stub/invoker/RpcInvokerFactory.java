@@ -1,10 +1,13 @@
 package io.daiwei.rpc.stub.invoker;
 
+import io.daiwei.rpc.stub.invoker.component.InvokerUnit;
+import io.daiwei.rpc.stub.invoker.component.RegisterUnit;
 import io.daiwei.rpc.stub.invoker.refbean.RpcRefBean;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatchers;
 
+import java.util.LinkedList;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -12,11 +15,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class RpcInvokerFactory {
 
+    private InvokerUnit invokerUnit;
 
-    private final ConcurrentHashMap<Class<?>, Object> stubs = new ConcurrentHashMap();
-
-
-
+    private RegisterUnit registerUnit;
 
     /**
      * 创建调用的 stub
@@ -24,17 +25,13 @@ public class RpcInvokerFactory {
      * @return
      */
     public Object createStub(RpcRefBean rpcRefBean) {
-        rpcRefBean.init();
-        if (stubs.contains(rpcRefBean.getTargetFace())) {
-            return stubs.get(rpcRefBean.getTargetFace());
-        }
+        rpcRefBean.init(this.invokerUnit);
         // byte-buddy 创建代理调用桩
         Object stub = null;
         try {
             stub = new ByteBuddy().subclass(rpcRefBean.getTargetFace()).method(ElementMatchers.any())
-                    .intercept(MethodDelegation.to(new DelegateInvokerMethod(rpcRefBean.getSerializerInstance(), rpcRefBean.getClientInstance())))
+                    .intercept(MethodDelegation.to(new DelegateInvokerMethod(rpcRefBean.getClientInstance())))
                     .make().load(this.getClass().getClassLoader()).getLoaded().newInstance();
-            stubs.put(rpcRefBean.getTargetFace(), stub);
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
         }
@@ -46,10 +43,16 @@ public class RpcInvokerFactory {
     }
 
     public void stop() {
-        // 停机时候时调用
+        try {
+            invokerUnit.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
-    private void initBean() {
-
+    private void init(InvokerUnit invokerUnit, RegisterUnit registerUnit) {
+        this.invokerUnit = invokerUnit;
+        this.registerUnit = registerUnit;
     }
 }
