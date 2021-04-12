@@ -9,9 +9,7 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>rpc-core</module>
-        <module>rpc-demo-server</module>
-        <module>rpc-demo-client</module>
-        <module>rpc-demo-common</module>
+        <module>rpc-test-demo</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -22,7 +20,7 @@
         <springboot.version>2.4.3</springboot.version>
         <spring.version>5.2.2.RELEASE</spring.version>
         <lombok.version>1.18.18</lombok.version>
-        <log.version>1.2.17</log.version>
+        <log.version>1.7.30</log.version>
         <fastjson.version>1.2.70</fastjson.version>
         <cglib.version>3.2.4</cglib.version>
         <reflect.version>0.9.11</reflect.version>
@@ -44,9 +42,14 @@
                 <version>${cglib.version}</version>
             </dependency>
             <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
                 <version>${log.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>2.12.1</version>
             </dependency>
             <dependency>
                 <groupId>com.alibaba</groupId>
