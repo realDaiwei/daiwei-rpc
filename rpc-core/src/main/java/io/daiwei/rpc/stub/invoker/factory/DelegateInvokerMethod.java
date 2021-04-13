@@ -1,6 +1,5 @@
 package io.daiwei.rpc.stub.invoker.factory;
 
-import io.daiwei.rpc.serializer.RpcSerializer;
 import io.daiwei.rpc.stub.net.Client;
 import io.daiwei.rpc.stub.net.params.RpcFutureResp;
 import io.daiwei.rpc.stub.net.params.RpcRequest;
@@ -10,7 +9,6 @@ import net.bytebuddy.implementation.bind.annotation.*;
 import java.lang.reflect.Method;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.LongAdder;
 
 /**
  * Created by Daiwei on 2021/3/31
@@ -25,7 +23,6 @@ public class DelegateInvokerMethod {
         this.client = client;
     }
 
-
     @RuntimeType
     public Object interceptor(@This Object target, @AllArguments Object[] args, @Origin Method method, @Super Object clazz) {
         Class<?> iface = target.getClass().getInterfaces()[0];
@@ -38,7 +35,7 @@ public class DelegateInvokerMethod {
             if (rpcResponse.getException() != null) {
                 throw new ExecutionException(request.getClassName() + "invoke failed", rpcResponse.getException());
             }
-            if (rpcResponse.getData() != null) {
+            if (!void.class.equals(method.getReturnType()) && rpcResponse.getData() != null) {
                 return method.getReturnType().cast(rpcResponse.getData());
             }
         } catch (InterruptedException | ExecutionException e) {

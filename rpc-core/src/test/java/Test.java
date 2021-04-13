@@ -8,6 +8,6 @@ public class Test {
 
 
     public static void main(String[] args) {
-        log.debug("hello from {}", "daiwei");
+
     }
 }

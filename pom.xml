@@ -27,6 +27,7 @@
         <guava.version>29.0-jre</guava.version>
         <bytebuddy.version>1.10.20</bytebuddy.version>
         <netty.version>4.1.51.Final</netty.version>
+        <hessian.version>4.0.63</hessian.version>
     </properties>
 
     <dependencyManagement>
@@ -50,11 +51,6 @@
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-core</artifactId>
                 <version>2.12.1</version>
-            </dependency>
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>fastjson</artifactId>
-                <version>${fastjson.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -95,6 +91,12 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
                 <version>${netty.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.caucho</groupId>
+                <artifactId>hessian</artifactId>
+                <version>${hessian.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
