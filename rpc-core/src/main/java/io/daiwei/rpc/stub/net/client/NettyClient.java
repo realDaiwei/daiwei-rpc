@@ -24,6 +24,7 @@ public class NettyClient extends Client {
 
     @Override
     public RpcFutureResp sendAsync(RpcRequest request) {
+        // TODO: 2021/4/13 做一个 failover
         RpcFutureResp resp = new RpcFutureResp();
         respPool.put(request.getRequestId(), resp);
         connectServer.sendAsync(request);

@@ -1,6 +1,7 @@
 package io.daiwei.rpc.stub.invoker.factory;
 
 import io.daiwei.rpc.serializer.impl.DefaultSerializer;
+import io.daiwei.rpc.serializer.impl.HessianSerializer;
 import io.daiwei.rpc.stub.invoker.component.InvokerUnit;
 import io.daiwei.rpc.stub.invoker.component.RegisterUnit;
 import io.daiwei.rpc.stub.invoker.refbean.RpcRefBean;
@@ -43,7 +44,7 @@ public class RpcInvokerFactory {
     }
 
     public void start() {
-        this.invokerUnit = new InvokerUnit(DefaultSerializer.class, NettyInvokerClient.class);
+        this.invokerUnit = new InvokerUnit(HessianSerializer.class, NettyInvokerClient.class);
         this.registerUnit = null;
         try {
             this.invokerUnit.afterSetProperties();

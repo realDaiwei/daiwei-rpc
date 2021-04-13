@@ -1,8 +1,11 @@
 package io.daiwei.rpc.stub.net.client;
 
 import io.daiwei.rpc.serializer.RpcSerializer;
+import io.daiwei.rpc.stub.net.codec.NettyDecoder;
+import io.daiwei.rpc.stub.net.codec.NettyEncoder;
 import io.daiwei.rpc.stub.net.common.ConnectServer;
 import io.daiwei.rpc.stub.net.params.RpcRequest;
+import io.daiwei.rpc.stub.net.params.RpcResponse;
 import io.daiwei.rpc.util.NetUtil;
 import io.daiwei.rpc.util.ThreadPoolUtil;
 import io.netty.bootstrap.Bootstrap;
@@ -47,8 +50,9 @@ public class NettyClientServer extends ConnectServer {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            // todo 添加可拓展协议 传入 serializer
-                            ch.pipeline().addLast(new ClientHandler());
+                            ch.pipeline().addLast(new NettyEncoder(RpcRequest.class, serializer))
+                                    .addLast(new NettyDecoder(RpcResponse.class, serializer))
+                                    .addLast(new ClientHandler());
                         }
                     });
             this.channel = bootstrap.connect(this.host, this.port).sync().channel();
