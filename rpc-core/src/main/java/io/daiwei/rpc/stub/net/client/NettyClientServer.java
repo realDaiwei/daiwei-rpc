@@ -60,7 +60,7 @@ public class NettyClientServer extends ConnectServer {
                 close();
                 log.debug("client for addr[{}] is closed", address);
             }
-            log.debug("daiwei-rpc clint connected {}:{} successfully" , this.host, this.port);
+            log.debug("daiwei-rpc clint connect {}:{} successfully" , this.host, this.port);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -84,8 +84,8 @@ public class NettyClientServer extends ConnectServer {
     }
 
     @Override
-    public void sendAsync(RpcRequest request) {
-        ThreadPoolUtil.defaultRpcExecutor().execute(() -> {
+    public void sendAsync(Object request) {
+        ThreadPoolUtil.defaultRpcClientExecutor().execute(() -> {
             channel.writeAndFlush(request);
         });
     }
@@ -114,4 +114,5 @@ public class NettyClientServer extends ConnectServer {
             }
         }
     }
+
 }

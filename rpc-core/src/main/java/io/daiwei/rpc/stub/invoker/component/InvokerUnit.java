@@ -1,9 +1,8 @@
 package io.daiwei.rpc.stub.invoker.component;
 
 import io.daiwei.rpc.serializer.RpcSerializer;
-import io.daiwei.rpc.stub.common.RpcCallback;
 import io.daiwei.rpc.stub.net.Client;
-import io.daiwei.rpc.stub.net.common.InvokerClientCore;
+import io.daiwei.rpc.stub.net.common.ClientInvokerCore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,27 +13,18 @@ import java.util.List;
  */
 public class InvokerUnit {
 
-    private final List<RpcCallback> stopCallbackList = new ArrayList<>();
-
     private final Class<? extends RpcSerializer> serializerClazz;
 
-    private final Class<? extends InvokerClientCore> clientClazz;
+    private final Class<? extends ClientInvokerCore> clientClazz;
 
-    private InvokerClientCore clientCore;
+    private ClientInvokerCore clientCore;
 
-    public InvokerUnit(Class<? extends RpcSerializer> serializerClazz, Class<? extends InvokerClientCore> clientClazz) {
+    public InvokerUnit(Class<? extends RpcSerializer> serializerClazz, Class<? extends ClientInvokerCore> clientClazz) {
         this.serializerClazz = serializerClazz;
         this.clientClazz = clientClazz;
     }
 
-    public void addStopCallBack(RpcCallback callback) {
-        this.stopCallbackList.add(callback);
-    }
-
     public void stop() throws Exception{
-        for (RpcCallback rpcCallback : this.stopCallbackList) {
-            rpcCallback.run();
-        }
         clientCore.stopClientServer();
     }
 

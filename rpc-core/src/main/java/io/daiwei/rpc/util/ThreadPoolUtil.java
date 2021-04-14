@@ -19,7 +19,9 @@ public class ThreadPoolUtil {
 
     private static final Integer QUEUE_CAPACITY = 4096;
 
-    private volatile static ExecutorService defaultExecutor;
+    private volatile static ExecutorService DEFAULT_CLIENT_EXECUTOR;
+
+    private volatile static ExecutorService DEFAULT_SERVER_EXECUTOR;
 
     private static final List<ExecutorService> EXECUTOR_POOLS = new CopyOnWriteArrayList<>();
 
@@ -34,16 +36,28 @@ public class ThreadPoolUtil {
         return poolExecutor;
     }
 
-    public static ExecutorService defaultRpcExecutor() {
-        if (defaultExecutor == null) {
+    public static ExecutorService defaultRpcClientExecutor() {
+        if (DEFAULT_CLIENT_EXECUTOR == null) {
             synchronized (ThreadPoolUtil.class) {
-                if (defaultExecutor == null) {
-                    defaultExecutor = createPool("rpc-default-pool");
-                    return defaultExecutor;
+                if (DEFAULT_CLIENT_EXECUTOR == null) {
+                    DEFAULT_CLIENT_EXECUTOR = createPool("rpc-default-client-pool");
+                    return DEFAULT_CLIENT_EXECUTOR;
                 }
             }
         }
-        return defaultExecutor;
+        return DEFAULT_CLIENT_EXECUTOR;
+    }
+
+    public static ExecutorService defaultRpcProviderExecutor() {
+        if (DEFAULT_SERVER_EXECUTOR == null) {
+            synchronized (ThreadPoolUtil.class) {
+                if (DEFAULT_SERVER_EXECUTOR == null) {
+                    DEFAULT_SERVER_EXECUTOR = createPool("rpc-default-server-pool");
+                    return DEFAULT_SERVER_EXECUTOR;
+                }
+            }
+        }
+        return DEFAULT_SERVER_EXECUTOR;
     }
 
     public static void shutdownExistsPools() {

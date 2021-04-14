@@ -1,9 +1,8 @@
 package io.daiwei.rpc.stub.invoker.factory;
 
-import io.daiwei.rpc.serializer.impl.DefaultSerializer;
 import io.daiwei.rpc.serializer.impl.HessianSerializer;
 import io.daiwei.rpc.stub.invoker.component.InvokerUnit;
-import io.daiwei.rpc.stub.invoker.component.RegisterUnit;
+import io.daiwei.rpc.stub.invoker.component.InvokerRegisterUnit;
 import io.daiwei.rpc.stub.invoker.refbean.RpcRefBean;
 import io.daiwei.rpc.stub.net.client.NettyInvokerClient;
 import io.daiwei.rpc.util.ThreadPoolUtil;
@@ -18,7 +17,7 @@ public class RpcInvokerFactory {
 
     private InvokerUnit invokerUnit;
 
-    private RegisterUnit registerUnit;
+    private InvokerRegisterUnit registerUnit;
 
     public RpcInvokerFactory() {
         start();

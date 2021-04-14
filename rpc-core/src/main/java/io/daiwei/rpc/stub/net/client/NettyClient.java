@@ -4,14 +4,13 @@ import io.daiwei.rpc.stub.net.Client;
 import io.daiwei.rpc.stub.net.common.ConnectServer;
 import io.daiwei.rpc.stub.net.params.RpcFutureResp;
 import io.daiwei.rpc.stub.net.params.RpcRequest;
-import io.daiwei.rpc.stub.net.params.RpcResponse;
 
 import java.util.Map;
 
 /**
  * Created by Daiwei on 2021/4/11
  */
-public class NettyClient extends Client {
+public class NettyClient implements Client {
 
     private final ConnectServer connectServer;
 

@@ -8,9 +8,9 @@ import io.daiwei.rpc.stub.net.params.RpcRequest;
  * 客户端基础类
  * Created by Daiwei on 2021/3/28
  */
-public abstract class Client {
+public interface Client {
 
-    public abstract RpcFutureResp sendAsync(RpcRequest request);
+    RpcFutureResp sendAsync(RpcRequest request);
 
-    public abstract void cleanAfterInvoke(RpcRequest request);
+    void cleanAfterInvoke(RpcRequest request);
 }
