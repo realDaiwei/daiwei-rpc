@@ -3,7 +3,7 @@ package io.daiwei.rpc.stub.common;
 /**
  * Created by Daiwei on 2021/4/11
  */
-public interface RpcCallback {
+public interface RpcSendable {
 
-    void run() throws Exception;
+    void sendAsync(Object o);
 }

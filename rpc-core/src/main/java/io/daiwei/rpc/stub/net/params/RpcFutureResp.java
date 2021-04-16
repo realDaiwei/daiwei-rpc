@@ -23,7 +23,7 @@ public class RpcFutureResp implements Future<RpcResponse> {
 
     private final Condition fin = lock.newCondition();
 
-    public void RespBellRing(RpcResponse resp) {
+    public void RespBackBellRing(RpcResponse resp) {
         this.resp = resp;
         try {
             lock.lock();
@@ -50,7 +50,7 @@ public class RpcFutureResp implements Future<RpcResponse> {
 
     @Override
     public RpcResponse get() throws InterruptedException, ExecutionException {
-        get(5000, TimeUnit.MILLISECONDS);
+        get(-1, TimeUnit.MILLISECONDS);
         return resp;
     }
 
@@ -70,7 +70,6 @@ public class RpcFutureResp implements Future<RpcResponse> {
             }
             if (!isDone()) {
                 log.error("daiwei-rpc invoke timeout.");
-                resp = new RpcResponse();
                 resp.setException(new TimeoutException("inoke timeout"));
             }
         } finally {

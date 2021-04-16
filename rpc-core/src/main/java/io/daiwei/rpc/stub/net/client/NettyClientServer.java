@@ -4,6 +4,7 @@ import io.daiwei.rpc.serializer.RpcSerializer;
 import io.daiwei.rpc.stub.net.codec.NettyDecoder;
 import io.daiwei.rpc.stub.net.codec.NettyEncoder;
 import io.daiwei.rpc.stub.net.common.ConnectServer;
+import io.daiwei.rpc.stub.net.params.RpcFutureResp;
 import io.daiwei.rpc.stub.net.params.RpcRequest;
 import io.daiwei.rpc.stub.net.params.RpcResponse;
 import io.daiwei.rpc.util.NetUtil;
@@ -16,6 +17,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -36,7 +38,7 @@ public class NettyClientServer extends ConnectServer {
     }
 
     @Override
-    public void init(String address) {
+    public void init(String address, Map<String, RpcFutureResp> respPool) {
         initEventLoop();
         String[] hostAndPort = NetUtil.getHostAndPort(address);
         this.host = hostAndPort[0];
@@ -52,7 +54,7 @@ public class NettyClientServer extends ConnectServer {
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ch.pipeline().addLast(new NettyEncoder(RpcRequest.class, serializer))
                                     .addLast(new NettyDecoder(RpcResponse.class, serializer))
-                                    .addLast(new ClientHandler());
+                                    .addLast(new ClientHandler(respPool));
                         }
                     });
             this.channel = bootstrap.connect(this.host, this.port).sync().channel();
@@ -60,7 +62,7 @@ public class NettyClientServer extends ConnectServer {
                 close();
                 log.debug("client for addr[{}] is closed", address);
             }
-            log.debug("daiwei-rpc clint connected {}:{} successfully" , this.host, this.port);
+            log.debug("daiwei-rpc clint connect {}:{} successfully" , this.host, this.port);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -84,8 +86,8 @@ public class NettyClientServer extends ConnectServer {
     }
 
     @Override
-    public void sendAsync(RpcRequest request) {
-        ThreadPoolUtil.defaultRpcExecutor().execute(() -> {
+    public void sendAsync(Object request) {
+        ThreadPoolUtil.defaultRpcClientExecutor().execute(() -> {
             channel.writeAndFlush(request);
         });
     }
@@ -114,4 +116,5 @@ public class NettyClientServer extends ConnectServer {
             }
         }
     }
+
 }

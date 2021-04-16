@@ -1,7 +1,7 @@
 package io.daiwei.rpc.stub.net.client;
 
 import io.daiwei.rpc.stub.net.Client;
-import io.daiwei.rpc.stub.net.common.InvokerClientCore;
+import io.daiwei.rpc.stub.net.common.ClientInvokerCore;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -9,10 +9,9 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Created by Daiwei on 2021/4/10
  */
-public class NettyInvokerClient extends InvokerClientCore {
+public class NettyInvokerClient extends ClientInvokerCore {
 
     private final Lock lock = new ReentrantLock();
-
 
     @Override
     public Client getClient(String addr) {
@@ -31,7 +30,7 @@ public class NettyInvokerClient extends InvokerClientCore {
             }
             NettyClientServer clientServer = new NettyClientServer(this.serializer);
             // 初始化一个client 客户端
-            clientServer.init(addr);
+            clientServer.init(addr, this.respPool);
             this.clientServers.put(addr, clientServer);
         }
     }

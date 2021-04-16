@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by Daiwei on 2021/4/11
  */
 @Slf4j
-public abstract class InvokerClientCore {
+public abstract class ClientInvokerCore {
 
     protected final Map<String, ConnectServer> clientServers = new ConcurrentHashMap<>();
 

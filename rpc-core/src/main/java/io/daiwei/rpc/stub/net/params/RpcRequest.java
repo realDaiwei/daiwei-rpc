@@ -3,12 +3,16 @@ package io.daiwei.rpc.stub.net.params;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * Created by Daiwei on 2021/3/30
  */
 @Data
 @Builder
-public class RpcRequest {
+public class RpcRequest implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String requestId;
 

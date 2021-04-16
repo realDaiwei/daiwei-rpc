@@ -20,7 +20,7 @@ public class HessianSerializer implements RpcSerializer {
         Hessian2Output output = new Hessian2Output(outputStream);
         try {
             output.writeObject(obj);
-            output.flushBuffer();
+            output.flush();
             return outputStream.toByteArray();
         } catch (IOException e) {
             e.printStackTrace();
