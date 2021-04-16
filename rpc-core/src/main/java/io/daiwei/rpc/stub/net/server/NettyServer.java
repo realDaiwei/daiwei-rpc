@@ -7,6 +7,7 @@ import io.daiwei.rpc.stub.net.codec.NettyEncoder;
 import io.daiwei.rpc.stub.net.common.ProviderInvokerCore;
 import io.daiwei.rpc.stub.net.params.RpcRequest;
 import io.daiwei.rpc.stub.net.params.RpcResponse;
+import io.daiwei.rpc.stub.provider.invoke.RpcProviderProxyPool;
 import io.daiwei.rpc.util.ThreadPoolUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -41,7 +42,7 @@ public class NettyServer implements RpcSendable {
 
     private EventLoopGroup workerGroup;
 
-    private Channel channel;
+    private ChannelFuture channelFuture;
 
     public NettyServer(Integer port, RpcSerializer serializer) {
         this.port = port;
@@ -75,8 +76,9 @@ public class NettyServer implements RpcSendable {
                                     .addLast(new ServerHandler(invokerCore, channels, reqChannelIdMap));
                         }
                     });
-            this.channel = serverBootstrap.bind(this.port).sync().channel();
-            log.debug("daiwei-rpc server start successfully and listen for port "+ this.port);
+            channelFuture = serverBootstrap.bind(this.port).sync();
+            log.debug("daiwei-rpc server afterSetProperties successfully and listen for port "+ this.port);
+            channelFuture.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
             log.error("thread of daiwei-rpc server is interrupted, perhaps rpc server stopped working.");
@@ -89,19 +91,19 @@ public class NettyServer implements RpcSendable {
      * 关闭 netty Server
      */
     public void close() {
-        if (isValid()) {
-            this.channel.close();
-        }
         if (bossGroup != null) {
             this.bossGroup.shutdownGracefully();
         }
         if (workerGroup != null) {
             this.workerGroup.shutdownGracefully();
         }
+        ThreadPoolUtil.shutdownExistsPools();
+        RpcProviderProxyPool.getInstance().cleanPool();
+        log.debug("netty server of rpc is offline");
     }
 
     public boolean isValid() {
-        return this.channel != null && this.channel.isActive();
+        return this.channelFuture != null && this.channelFuture.channel().isActive();
     }
 
     /**
@@ -109,17 +111,20 @@ public class NettyServer implements RpcSendable {
      * @param obj
      */
     public void sendAsync(Object obj) {
-        ThreadPoolUtil.defaultRpcProviderExecutor().execute(() ->{
-            RpcResponse response = (RpcResponse) obj;
-            channels.find(this.reqChannelIdMap.get(response.getRequestId())).writeAndFlush(response);
-            reqChannelIdMap.remove(response.getRequestId());
-        });
+        try {
+            ThreadPoolUtil.defaultRpcProviderExecutor().execute(() ->{
+                RpcResponse response = (RpcResponse) obj;
+                channels.find(this.reqChannelIdMap.get(response.getRequestId())).writeAndFlush(response);
+                reqChannelIdMap.remove(response.getRequestId());
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public String toString() {
         return "rpc netty server for port[" + this.port + "]";
     }
-
 
 }

@@ -1,4 +1,4 @@
-package io.daiwei.rpc.stub.provider.proxy;
+package io.daiwei.rpc.stub.provider.invoke;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,8 +32,13 @@ public class RpcProviderProxyPool {
         this.proxyMap.putIfAbsent(clazz, proxy);
     }
 
-    public void exists(Class<?> clazz) {
-        this.proxyMap.containsKey(clazz);
+    public boolean exists(Class<?> clazz) {
+        return this.proxyMap.containsKey(clazz);
+    }
+
+    public void cleanPool() {
+        this.proxyMap.clear();
+        POOL = null;
     }
 
     public Object getProxy(Class<?> clazz) {

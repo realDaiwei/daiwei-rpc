@@ -9,7 +9,8 @@ public interface Server {
 
     void start();
 
-    void stop();
+    boolean isActive();
 
-    void sendAsync(RpcResponse response);
+    void sendAsync();
+
 }

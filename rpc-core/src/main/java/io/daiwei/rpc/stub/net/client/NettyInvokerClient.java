@@ -30,7 +30,7 @@ public class NettyInvokerClient extends ClientInvokerCore {
             }
             NettyClientServer clientServer = new NettyClientServer(this.serializer);
             // 初始化一个client 客户端
-            clientServer.init(addr);
+            clientServer.init(addr, this.respPool);
             this.clientServers.put(addr, clientServer);
         }
     }

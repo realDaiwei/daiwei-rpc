@@ -2,9 +2,11 @@ package io.daiwei.rpc.stub.net.common;
 
 import io.daiwei.rpc.serializer.RpcSerializer;
 import io.daiwei.rpc.stub.common.RpcSendable;
+import io.daiwei.rpc.stub.net.params.RpcFutureResp;
 import io.daiwei.rpc.stub.net.params.RpcRequest;
 import io.netty.channel.Channel;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -18,7 +20,7 @@ public abstract class ConnectServer implements RpcSendable {
 
     protected Integer port;
 
-    public abstract void init(String address);
+    public abstract void init(String address, Map<String, RpcFutureResp> respPool);
 
     public abstract void close();
 

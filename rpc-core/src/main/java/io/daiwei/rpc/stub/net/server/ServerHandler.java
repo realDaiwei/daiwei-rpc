@@ -33,10 +33,16 @@ public class ServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RpcRequest msg) throws Exception {
         ThreadPoolUtil.defaultRpcProviderExecutor().execute(() -> {
-            Channel channel = ctx.channel();
-            channels.add(channel);
-            reqIdChannelIdMap.put(msg.getRequestId(), channel.id());
-            invokerCore.requestComingBellRing(msg);
+            try {
+                if (invokerCore.valid(msg)) {
+                    Channel channel = ctx.channel();
+                    channels.add(channel);
+                    reqIdChannelIdMap.put(msg.getRequestId(), channel.id());
+                    invokerCore.requestComingBellRing(msg);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
     }
 
@@ -45,4 +51,5 @@ public class ServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
         log.error("daiwei-rpc server catch a exception, ctx is closing");
         ctx.close();
     }
+
 }
