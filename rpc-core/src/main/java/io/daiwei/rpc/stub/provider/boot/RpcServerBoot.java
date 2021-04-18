@@ -3,6 +3,7 @@ package io.daiwei.rpc.stub.provider.boot;
 import io.daiwei.rpc.exception.DaiweiRpcException;
 import io.daiwei.rpc.stub.provider.component.ProviderRegisterUnit;
 import io.daiwei.rpc.stub.provider.component.ProviderServerUnit;
+import io.daiwei.rpc.util.NetUtil;
 
 /**
  *  server 启动boot
@@ -14,15 +15,19 @@ public class RpcServerBoot {
 
     private final ProviderServerUnit serverStubUnit;
 
-    private RpcServerBoot(int port) {
-        this.registerUnit = new ProviderRegisterUnit();
+    private final int availablePort;
+
+    private RpcServerBoot(int port, String zkConnStr) {
+        this.availablePort = port;
+        this.registerUnit = new ProviderRegisterUnit(zkConnStr);
         this.serverStubUnit = new ProviderServerUnit(port);
     }
 
-    private RpcServerBoot() {
+    private RpcServerBoot(String zkConnStr) {
         int defaultPort = 7248;
-        this.registerUnit = new ProviderRegisterUnit();
-        this.serverStubUnit = new ProviderServerUnit(defaultPort);
+        this.availablePort = NetUtil.findAvailablePort(defaultPort);
+        this.registerUnit = new ProviderRegisterUnit(zkConnStr);
+        this.serverStubUnit = new ProviderServerUnit(this.availablePort);
     }
 
     public void run() {
@@ -39,28 +44,26 @@ public class RpcServerBoot {
 
         private ServerBuilder() {}
 
-        public ServerBuilder init(int port) {
+        public ServerBuilder init(int serverPort, String zkConnStr) {
             if (this.rpcServerBoot != null) {
                 throw new DaiweiRpcException("server already initialized!");
             }
-            rpcServerBoot = new RpcServerBoot(port);
+            rpcServerBoot = new RpcServerBoot(serverPort, zkConnStr);
             return this;
         }
 
-        public ServerBuilder init() {
+        public ServerBuilder init(String zkConnStr) {
             if (this.rpcServerBoot != null) {
                 throw new DaiweiRpcException("server already initialized!");
             }
-            rpcServerBoot = new RpcServerBoot();
+            rpcServerBoot = new RpcServerBoot(zkConnStr);
             return this;
         }
 
         public ServerBuilder registerService(Class<?> clazz) {
-            if (this.rpcServerBoot.registerUnit == null) {
-                throw new DaiweiRpcException("init server first!");
-            }
             try {
                 this.rpcServerBoot.registerUnit.registerInvokeProxy(clazz);
+                this.rpcServerBoot.registerUnit.registerService(this.rpcServerBoot.availablePort, clazz);
             } catch (InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }

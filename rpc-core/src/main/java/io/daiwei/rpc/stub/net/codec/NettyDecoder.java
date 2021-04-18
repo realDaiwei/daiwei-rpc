@@ -4,12 +4,14 @@ import io.daiwei.rpc.serializer.RpcSerializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 
 /**
  * Created by Daiwei on 2021/4/12
  */
+@Slf4j
 public class NettyDecoder extends ByteToMessageDecoder {
 
     private Class<?> clazz;
@@ -37,7 +39,12 @@ public class NettyDecoder extends ByteToMessageDecoder {
         }
         byte[] bytes = new byte[len];
         in.readBytes(bytes);
-        Object msg = serializer.deserialize(bytes, clazz);
-        out.add(msg);
+        try {
+            Object msg = serializer.deserialize(bytes, clazz);
+            out.add(msg);
+        } catch (Exception e) {
+            log.error("server catch exception!", e);
+            e.printStackTrace();
+        }
     }
 }

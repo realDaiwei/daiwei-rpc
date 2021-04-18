@@ -94,7 +94,7 @@ public class NettyClientServer extends ConnectServer {
 
     @Override
     public String toString() {
-        return "nettt client for " + host + ":" + port;
+        return "netty client for " + host + ":" + port;
     }
 
     @Override

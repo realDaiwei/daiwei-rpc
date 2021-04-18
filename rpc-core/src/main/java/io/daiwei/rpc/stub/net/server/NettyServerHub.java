@@ -28,9 +28,14 @@ public class NettyServerHub implements Server {
     @Override
     public void start() {
         if (!this.nettyServer.isValid() && this.invokerCore != null) {
-            new Thread(() -> {
-                this.nettyServer.run(this.invokerCore);
-            }, "daiwei-rpc-server-thread").start();
+            try {
+                new Thread(() -> {
+                    this.nettyServer.run(this.invokerCore);
+                }, "daiwei-rpc-server-thread").start();
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> this.nettyServer.close()));
+            } catch (Exception e) {
+                log.error("error!", e);
+            }
         }
     }
 

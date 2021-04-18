@@ -10,7 +10,7 @@ import io.daiwei.rpc.stub.net.params.RpcResponse;
  */
 public abstract class ProviderInvokerCore {
 
-    protected static final long REQ_TIME_OUT = 3000;
+    protected static final long REQ_TIME_OUT = 1000;
 
     protected RpcSendable sendable;
 

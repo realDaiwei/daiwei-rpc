@@ -63,9 +63,7 @@ public class NettyServer implements RpcSendable {
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.option(ChannelOption.SO_BACKLOG, 128)
                     .option(ChannelOption.SO_REUSEADDR, true)
-                    .option(ChannelOption.TCP_NODELAY, true)
                     .option(ChannelOption.SO_RCVBUF, 32 * 1024)
-                    .option(EpollChannelOption.SO_REUSEPORT, true)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
             serverBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
@@ -77,7 +75,7 @@ public class NettyServer implements RpcSendable {
                         }
                     });
             channelFuture = serverBootstrap.bind(this.port).sync();
-            log.debug("daiwei-rpc server afterSetProperties successfully and listen for port "+ this.port);
+            log.info("daiwei-rpc server start successfully and listen for port "+ this.port);
             channelFuture.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -97,6 +95,7 @@ public class NettyServer implements RpcSendable {
         if (workerGroup != null) {
             this.workerGroup.shutdownGracefully();
         }
+        this.channels.close();
         ThreadPoolUtil.shutdownExistsPools();
         RpcProviderProxyPool.getInstance().cleanPool();
         log.debug("netty server of rpc is offline");

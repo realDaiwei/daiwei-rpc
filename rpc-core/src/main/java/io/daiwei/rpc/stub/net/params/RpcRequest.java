@@ -12,8 +12,6 @@ import java.io.Serializable;
 @Builder
 public class RpcRequest implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
     private String requestId;
 
     private String className;
@@ -27,5 +25,7 @@ public class RpcRequest implements Serializable {
     private long createTimeMillis;
 
     private String accessToken;
+
+    private long timeout;
 
 }

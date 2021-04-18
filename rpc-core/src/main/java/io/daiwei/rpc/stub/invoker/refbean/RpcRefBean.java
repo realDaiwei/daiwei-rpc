@@ -1,6 +1,8 @@
 package io.daiwei.rpc.stub.invoker.refbean;
 
+import io.daiwei.rpc.stub.invoker.component.InvokerRegisterUnit;
 import io.daiwei.rpc.stub.invoker.component.InvokerUnit;
+import lombok.Builder;
 import lombok.Data;
 import io.daiwei.rpc.stub.net.Client;
 
@@ -11,15 +13,12 @@ import java.util.List;
  * Created by Daiwei on 2021/3/28
  */
 @Data
+@Builder
 public class RpcRefBean {
-
-    private Client clientInstance;
 
     private Class<?> targetFace;
 
-    private List<String> availAddr;
-
-    private String finalAddr;
+    private List<String> availUrls;
 
     private String accessToken;
 
@@ -27,11 +26,4 @@ public class RpcRefBean {
 
     private String version;
 
-    /**
-     * 初始化 确定调用的目标客户端
-     * 初始化 序列化器
-     */
-    public void init(InvokerUnit invokerUnit) {
-        this.clientInstance = invokerUnit.getInvokeClient(finalAddr);
-    }
 }

@@ -38,7 +38,7 @@ public abstract class ClientInvokerCore {
     public void stopClientServer() {
         clientServers.values().forEach(connectServer -> {
             connectServer.close();
-            log.info("connectServer[{}] stop successfully", connectServer);
+            log.info("connectServer[{}] close successfully", connectServer);
         });
         clientServers.values().stream().findFirst().ifPresent(ConnectServer::cleanStaticResource);
 
