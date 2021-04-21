@@ -5,8 +5,11 @@ import io.daiwei.rpc.register.RpcRegister;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.recipes.cache.CuratorCache;
+import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,4 +52,16 @@ public abstract class ZkRpcRegister implements RpcRegister {
 
     @Override
     public void registerService(int port, Class<?> clazz) throws Exception {}
+
+    @Override
+    public final void registerListeners(List<CuratorCacheListener> listeners) {
+        CuratorCache cache = CuratorCache.builder(client, File.separator).build();
+        for (CuratorCacheListener listener : listeners) {
+            cache.listenable().addListener(listener);
+        }
+        cache.start();
+    }
+
+    @Override
+    public void registerListeners() {}
 }

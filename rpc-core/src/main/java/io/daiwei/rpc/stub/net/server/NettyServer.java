@@ -5,6 +5,7 @@ import io.daiwei.rpc.stub.common.RpcSendable;
 import io.daiwei.rpc.stub.net.codec.NettyDecoder;
 import io.daiwei.rpc.stub.net.codec.NettyEncoder;
 import io.daiwei.rpc.stub.net.common.ProviderInvokerCore;
+import io.daiwei.rpc.stub.net.params.HeartBeat;
 import io.daiwei.rpc.stub.net.params.RpcRequest;
 import io.daiwei.rpc.stub.net.params.RpcResponse;
 import io.daiwei.rpc.stub.provider.invoke.RpcProviderProxyPool;
@@ -17,11 +18,13 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 真正的 netty Server
@@ -69,7 +72,8 @@ public class NettyServer implements RpcSendable {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new NettyDecoder(RpcRequest.class, serializer))
+                            ch.pipeline().addLast(new IdleStateHandler(0, 0, HeartBeat.BEAT_INTERVAL, TimeUnit.SECONDS))
+                                    .addLast(new NettyDecoder(RpcRequest.class, serializer))
                                     .addLast(new NettyEncoder(RpcResponse.class, serializer))
                                     .addLast(new ServerHandler(invokerCore, channels, reqChannelIdMap));
                         }

@@ -73,9 +73,5 @@ public class RpcServerBoot {
         public RpcServerBoot build() {
             return this.rpcServerBoot;
         }
-
     }
-
-
-
 }

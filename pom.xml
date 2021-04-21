@@ -117,6 +117,12 @@
                 <artifactId>curator-framework</artifactId>
                 <version>${zk.curator.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-recipes</artifactId>
+                <version>${zk.curator.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 </project>

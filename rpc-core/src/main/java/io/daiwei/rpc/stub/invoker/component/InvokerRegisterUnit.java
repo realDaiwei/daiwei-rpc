@@ -3,15 +3,16 @@ package io.daiwei.rpc.stub.invoker.component;
 import io.daiwei.rpc.exception.DaiweiRpcException;
 import io.daiwei.rpc.register.RegisterConstant;
 import io.daiwei.rpc.register.zk.ZkRpcRegister;
-import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
+import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.data.Stat;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -27,6 +28,7 @@ public class InvokerRegisterUnit extends ZkRpcRegister {
         this.zkConnStr = zkConnStr;
         this.init();
         this.start();
+        this.registerListeners();
         availPathMap = new ConcurrentHashMap<>();
     }
 
@@ -38,10 +40,17 @@ public class InvokerRegisterUnit extends ZkRpcRegister {
         }
         List<String> availPath = new ArrayList<>();
         try {
-            Stat stat = client.checkExists().forPath("/" + clazzName);
+            Stat stat = client.checkExists().forPath(File.separator + clazzName);
             if (stat != null) {
-                availPath = client.getChildren().forPath("/" + clazzName);
-                if (availPath != null && availPath.size() != 0) {
+                availPath = client.getChildren().forPath(File.separator + clazzName);
+                for (String s : availPath) {
+                    client.getData().usingWatcher((Watcher) watchedEvent -> {
+                        if (availPathMap.containsKey(clazzName)) {
+                            availPathMap.get(clazzName).remove(s);
+                        }
+                    }).forPath(File.separator + clazzName + File.separator + s);
+                }
+                if (availPath.size() != 0) {
                     CopyOnWriteArrayList<String> list = new CopyOnWriteArrayList<>(availPath);
                     availPathMap.putIfAbsent(clazzName, list);
                 } else {
@@ -54,6 +63,31 @@ public class InvokerRegisterUnit extends ZkRpcRegister {
         return availPath;
     }
 
-
-
+    @Override
+    public void registerListeners() {
+        CuratorCacheListener listener = CuratorCacheListener.builder().forPathChildrenCache(File.separator, client, new PathChildrenCacheListener() {
+            @Override
+            public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
+                if (!Arrays.asList(PathChildrenCacheEvent.Type.CHILD_REMOVED, PathChildrenCacheEvent.Type.CHILD_ADDED).contains(event.getType())) {
+                    return;
+                }
+                String[] str = event.getData().getPath().split(File.separator);
+                if (RegisterConstant.RPC_SERVICE.equals(new String(event.getData().getData(), StandardCharsets.UTF_8))) {
+                    if (!availPathMap.containsKey(str[1])) {
+                        availPathMap.put(str[1], new CopyOnWriteArrayList<>());
+                    }
+                    return;
+                }
+                if (event.getType() == PathChildrenCacheEvent.Type.CHILD_REMOVED) {
+                    availPathMap.get(str[1]).remove(str[2]);
+                } else if (event.getType() == PathChildrenCacheEvent.Type.CHILD_ADDED) {
+                    List<String> urls = availPathMap.get(str[1]);
+                    if (!urls.contains(str[2])) {
+                        urls.add(str[2]);
+                    }
+                }
+            }
+        }).build();
+        registerListeners(Collections.singletonList(listener));
+    }
 }

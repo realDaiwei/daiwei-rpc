@@ -1,5 +1,7 @@
 package io.daiwei.rpc.register;
 
+import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
+
 import java.util.List;
 
 /**
@@ -18,6 +20,10 @@ public interface RpcRegister {
     void registerInvokeProxy(Class<?> clazz) throws Exception;
 
     void registerService(int port, Class<?> clazz) throws Exception;
+
+    void registerListeners(List<CuratorCacheListener> listeners);
+
+    void registerListeners();
 
 }
 
