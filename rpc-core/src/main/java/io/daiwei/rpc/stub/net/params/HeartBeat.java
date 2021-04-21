@@ -1,5 +1,7 @@
 package io.daiwei.rpc.stub.net.params;
 
+import java.math.BigDecimal;
+
 /**
  * Created by Daiwei on 2021/4/22
  */
@@ -15,6 +17,9 @@ public final class HeartBeat {
         request = RpcRequest.builder().requestId(HEART_BEAT_ID).build();
     }
 
-
+    public static RpcResponse HealthResp(BigDecimal cpuLoad, BigDecimal memLoad) {
+        return RpcResponse.builder().code(0).msg("system health info")
+                .data(new SystemHealthInfo(cpuLoad, memLoad)).build();
+    }
 
 }
