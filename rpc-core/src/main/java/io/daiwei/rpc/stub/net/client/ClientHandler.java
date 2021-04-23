@@ -3,6 +3,7 @@ package io.daiwei.rpc.stub.net.client;
 import com.sun.xml.internal.bind.v2.model.core.ID;
 import io.daiwei.rpc.exception.DaiweiRpcException;
 import io.daiwei.rpc.stub.net.NetConstant;
+import io.daiwei.rpc.stub.net.common.ConnectServer;
 import io.daiwei.rpc.stub.net.params.HeartBeat;
 import io.daiwei.rpc.stub.net.params.RpcFutureResp;
 import io.daiwei.rpc.stub.net.params.RpcResponse;
@@ -34,9 +35,12 @@ public class ClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
 
     private final List<String> subHealthUrls;
 
-    public ClientHandler(Map<String, RpcFutureResp> respPool, List<String> subHealthUrls) {
+    private final Map<String, ConnectServer> clientServers;
+
+    public ClientHandler(Map<String, RpcFutureResp> respPool, List<String> subHealthUrls, Map<String, ConnectServer> clientServers) {
         this.respPool = respPool;
         this.subHealthUrls = subHealthUrls;
+        this.clientServers = clientServers;
     }
 
     @Override
@@ -45,6 +49,13 @@ public class ClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
             String serverAddr = ctx.channel().remoteAddress().toString().substring(1);
             if (msg.getRequestId().startsWith(NetConstant.HEART_BEAT_RESP_ID)) {
                 judgeHealth((SystemHealthInfo) msg.getData(), serverAddr);
+                return;
+            }
+            if (msg.getRequestId().startsWith(NetConstant.IDLE_CHANNEL_CLOSE_RESP_ID)) {
+                log.debug("channel[{}] close!", serverAddr);
+                subHealthUrls.remove(serverAddr);
+                clientServers.remove(serverAddr);
+                ctx.close();
                 return;
             }
             RpcFutureResp resp = respPool.get(msg.getRequestId());
@@ -68,10 +79,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
             log.debug("send heart beat request");
             String serverAddr = ctx.channel().remoteAddress().toString().substring(1);
             Integer times = IDLE_CONN_MAP.get(serverAddr);
-            if (null != times && times >= 10) {
-                // TODO: 2021/4/23 send Close msg; 
-            }
-            ctx.channel().writeAndFlush(HeartBeat.healthReq());
+            ctx.channel().writeAndFlush(null != times && times > 10 ? HeartBeat.channelCloseReq() : HeartBeat.healthReq());
         }
         super.userEventTriggered(ctx, evt);
     }
@@ -87,6 +95,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
                 subHealthUrls.add(serverAddr);
             }
         }
+        log.debug(Arrays.toString(subHealthUrls.toArray()));
     }
 
 

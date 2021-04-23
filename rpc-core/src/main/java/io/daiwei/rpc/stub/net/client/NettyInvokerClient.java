@@ -29,7 +29,7 @@ public class NettyInvokerClient extends ClientInvokerCore {
                 return;
             }
             NettyClientServer clientServer = new NettyClientServer(this.serializer);
-            clientServer.init(addr, new ClientHandler(respPool, this.subHealthList));
+            clientServer.init(addr, new ClientHandler(respPool, this.subHealthList, this.clientServers));
             this.clientServers.put(addr, clientServer);
         }
     }

@@ -46,6 +46,13 @@ public class ServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
                         ctx.channel().writeAndFlush(response);
                         return;
                     }
+                    if (msg.getRequestId().startsWith(NetConstant.IDLE_CHANNEL_CLOSE_REQ_ID)) {
+                        log.debug("idle channel close ask from {}", ctx.channel().remoteAddress());
+                        ctx.channel().writeAndFlush(HeartBeat.channelCloseResp());
+                        channels.find(ctx.channel().id()).close();
+                        ctx.close();
+                        return;
+                    }
                     Channel channel = ctx.channel();
                     channels.add(channel);
                     reqIdChannelIdMap.put(msg.getRequestId(), channel.id());

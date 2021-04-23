@@ -32,7 +32,7 @@ public abstract class ZkRpcRegister implements RpcRegister {
     @Override
     public void start() {
         client.start();
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> client.close()));
+        Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
     }
 
     @Override
