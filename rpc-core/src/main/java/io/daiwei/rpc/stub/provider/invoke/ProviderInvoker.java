@@ -1,6 +1,7 @@
 package io.daiwei.rpc.stub.provider.invoke;
 
 import io.daiwei.rpc.exception.DaiweiRpcException;
+import io.daiwei.rpc.stub.net.NetConstant;
 import io.daiwei.rpc.stub.net.common.ProviderInvokerCore;
 import io.daiwei.rpc.stub.net.params.RpcRequest;
 import io.daiwei.rpc.stub.net.params.RpcResponse;
@@ -40,9 +41,10 @@ public class ProviderInvoker extends ProviderInvokerCore {
 
     @Override
     public boolean valid(RpcRequest req) {
-        return req.getCreateTimeMillis() + REQ_TIME_OUT >= System.currentTimeMillis() && req.getRequestId() != null
+        return (req.getRequestId().startsWith(NetConstant.HEART_BEAT_REQ_ID) || req.getRequestId().startsWith(NetConstant.IDLE_CHANNEL_CLOSE_REQ_ID))
+                || (req.getCreateTimeMillis() + REQ_TIME_OUT >= System.currentTimeMillis() && req.getRequestId() != null
                 && req.getRequestId().length() != 0 && req.getClassName() != null && req.getClassName().length() != 0
                 && req.getMethodName() != null && req.getMethodName().length() != 0 && req.getClassType() != null
-                && req.getParams() != null ;
+                && req.getParams() != null);
     }
 }

@@ -42,7 +42,7 @@ public class TestAppMain {
 //            System.out.println(user);
 //        }
 //        System.out.println(System.currentTimeMillis() - start);
-//        while(true) {}
-        factory.stop();
+        while(true) {}
+//        factory.stop();
     }
 }

@@ -4,6 +4,7 @@ import io.daiwei.rpc.serializer.RpcSerializer;
 import io.daiwei.rpc.stub.net.codec.NettyDecoder;
 import io.daiwei.rpc.stub.net.codec.NettyEncoder;
 import io.daiwei.rpc.stub.net.common.ConnectServer;
+import io.daiwei.rpc.stub.net.params.HeartBeat;
 import io.daiwei.rpc.stub.net.params.RpcFutureResp;
 import io.daiwei.rpc.stub.net.params.RpcRequest;
 import io.daiwei.rpc.stub.net.params.RpcResponse;
@@ -15,9 +16,12 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -38,7 +42,7 @@ public class NettyClientServer extends ConnectServer {
     }
 
     @Override
-    public void init(String address, Map<String, RpcFutureResp> respPool) {
+    public void init(String address, Map<String, RpcFutureResp> respPool, List<String> healthUrls, List<String> subHealthUrls) {
         initEventLoop();
         String[] hostAndPort = NetUtil.getHostAndPort(address);
         this.host = hostAndPort[0];
@@ -52,9 +56,10 @@ public class NettyClientServer extends ConnectServer {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new NettyEncoder(RpcRequest.class, serializer))
+                            ch.pipeline().addLast(new IdleStateHandler(0, 0, HeartBeat.BEAT_INTERVAL, TimeUnit.SECONDS))
+                                    .addLast(new NettyEncoder(RpcRequest.class, serializer))
                                     .addLast(new NettyDecoder(RpcResponse.class, serializer))
-                                    .addLast(new ClientHandler(respPool));
+                                    .addLast(new ClientHandler(respPool, healthUrls, subHealthUrls));
                         }
                     });
             this.channel = bootstrap.connect(this.host, this.port).sync().channel();
@@ -70,7 +75,7 @@ public class NettyClientServer extends ConnectServer {
 
     @Override
     public void close() {
-        if (this.isValid() && this.channel != null) {
+        if (this.channel != null) {
             this.channel.close();
         }
     }

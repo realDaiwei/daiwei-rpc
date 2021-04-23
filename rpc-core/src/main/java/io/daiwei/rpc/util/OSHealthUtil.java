@@ -5,6 +5,7 @@ import oshi.hardware.CentralProcessor;
 import oshi.hardware.GlobalMemory;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.concurrent.TimeUnit;
 
@@ -34,7 +35,7 @@ public class OSHealthUtil {
         long iowait = ticks[CentralProcessor.TickType.IOWAIT.getIndex()] - prevTicks[CentralProcessor.TickType.IOWAIT.getIndex()];
         long idle = ticks[CentralProcessor.TickType.IDLE.getIndex()] - prevTicks[CentralProcessor.TickType.IDLE.getIndex()];
         long totalCpu = user + nice + cSys + idle + iowait + irq + softirq ;
-        return BigDecimal.valueOf(1.0 - (idle * 1.0 / totalCpu));
+        return BigDecimal.valueOf(1.0 - (idle * 1.0 / totalCpu)).setScale(4, RoundingMode.HALF_UP);
     }
 
     /**
@@ -46,6 +47,6 @@ public class OSHealthUtil {
         GlobalMemory memory = systemInfo.getHardware().getMemory();
         long totalByte = memory.getTotal();
         long availableByte = memory.getAvailable();
-        return BigDecimal.valueOf((totalByte-availableByte) * 1.0 / totalByte);
+        return BigDecimal.valueOf((totalByte-availableByte) * 1.0 / totalByte).setScale(4, RoundingMode.HALF_UP);
     }
 }

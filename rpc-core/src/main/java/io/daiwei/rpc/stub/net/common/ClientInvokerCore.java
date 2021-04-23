@@ -1,27 +1,28 @@
 package io.daiwei.rpc.stub.net.common;
 
 import io.daiwei.rpc.serializer.RpcSerializer;
+import io.daiwei.rpc.stub.common.ConnectionManager;
 import io.daiwei.rpc.stub.net.Client;
-import io.daiwei.rpc.stub.net.client.NettyClient;
-import io.daiwei.rpc.stub.net.client.NettyClientServer;
-import io.daiwei.rpc.stub.net.client.NettyInvokerClient;
 import io.daiwei.rpc.stub.net.params.RpcFutureResp;
-import io.daiwei.rpc.stub.net.params.RpcResponse;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by Daiwei on 2021/4/11
  */
 @Slf4j
-public abstract class ClientInvokerCore {
+public abstract class ClientInvokerCore implements ConnectionManager {
 
     protected final Map<String, ConnectServer> clientServers = new ConcurrentHashMap<>();
+
+    protected final List<String> healthList = new CopyOnWriteArrayList<>();
+
+    protected final List<String> subHealthList = new CopyOnWriteArrayList<>();
 
     protected final Map<String, RpcFutureResp> respPool = new ConcurrentHashMap<>();
 
@@ -35,12 +36,22 @@ public abstract class ClientInvokerCore {
         this.serializer = serializer;
     }
 
+    @Override
+    public void removeConn(String conn) {
+        if (this.clientServers.containsKey(conn)) {
+            this.clientServers.get(conn).close();
+        }
+        this.clientServers.remove(conn);
+        this.healthList.remove(conn);
+        this.subHealthList.remove(conn);
+    }
+
     public void stopClientServer() {
         clientServers.values().forEach(connectServer -> {
             connectServer.close();
             log.info("connectServer[{}] close successfully", connectServer);
         });
         clientServers.values().stream().findFirst().ifPresent(ConnectServer::cleanStaticResource);
-
     }
+
 }

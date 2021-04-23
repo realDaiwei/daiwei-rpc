@@ -27,6 +27,7 @@ public class RpcInvokerFactory {
 
     public RpcInvokerFactory(String zkConnStr) {
         start(zkConnStr);
+        Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
     }
 
     /**
@@ -61,11 +62,12 @@ public class RpcInvokerFactory {
     }
 
     public void start(String zkConnStr) {
-        this.invokerUnit = new InvokerUnit(HessianSerializer.class, NettyInvokerClient.class);
-        this.registerUnit = new InvokerRegisterUnit(zkConnStr);
-        this.loadBalance = new DefaultLoadBalance();
         try {
+            this.invokerUnit = new InvokerUnit(HessianSerializer.class, NettyInvokerClient.class);
             this.invokerUnit.afterSetProperties();
+            this.registerUnit = new InvokerRegisterUnit(zkConnStr, this.invokerUnit.getClientCore());
+            this.registerUnit.afterSetProperties();
+            this.loadBalance = new DefaultLoadBalance();
         } catch (Exception exception) {
             exception.printStackTrace();
         }

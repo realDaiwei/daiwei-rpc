@@ -72,8 +72,7 @@ public class NettyServer implements RpcSendable {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new IdleStateHandler(0, 0, HeartBeat.BEAT_INTERVAL, TimeUnit.SECONDS))
-                                    .addLast(new NettyDecoder(RpcRequest.class, serializer))
+                            ch.pipeline().addLast(new NettyDecoder(RpcRequest.class, serializer))
                                     .addLast(new NettyEncoder(RpcResponse.class, serializer))
                                     .addLast(new ServerHandler(invokerCore, channels, reqChannelIdMap));
                         }

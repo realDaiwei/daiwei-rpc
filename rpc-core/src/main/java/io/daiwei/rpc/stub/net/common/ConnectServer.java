@@ -6,6 +6,7 @@ import io.daiwei.rpc.stub.net.params.RpcFutureResp;
 import io.daiwei.rpc.stub.net.params.RpcRequest;
 import io.netty.channel.Channel;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,7 +21,7 @@ public abstract class ConnectServer implements RpcSendable {
 
     protected Integer port;
 
-    public abstract void init(String address, Map<String, RpcFutureResp> respPool);
+    public abstract void init(String address, Map<String, RpcFutureResp> respPool, List<String> healthUrls, List<String> subHealthUrls);
 
     public abstract void close();
 
