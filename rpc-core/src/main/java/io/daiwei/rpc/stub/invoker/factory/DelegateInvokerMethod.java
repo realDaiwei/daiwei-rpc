@@ -44,7 +44,8 @@ public class DelegateInvokerMethod {
         RpcRequest request = RpcRequest.builder().requestId(requestId)
                 .methodName(method.getName()).classType(iface).createTimeMillis(System.currentTimeMillis())
                 .params(args).className(iface.getCanonicalName()).timeout(timeout).build();
-        Client client = invokerUnit.getInvokeClient(loadBalance.select(this.urls));
+        List<String> healthUrls = invokerUnit.filterSubHealth(this.urls);
+        Client client = invokerUnit.getInvokeClient(loadBalance.select(healthUrls));
         RpcFutureResp rpcFutureResp = client.sendAsync(request);
         try {
             RpcResponse rpcResponse = rpcFutureResp.get();

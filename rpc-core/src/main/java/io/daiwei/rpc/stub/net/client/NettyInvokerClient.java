@@ -23,19 +23,18 @@ public class NettyInvokerClient extends ClientInvokerCore {
         if (this.clientServers.containsKey(addr)) {
             return;
         }
-        setIfLockAbsent(addr);
+        setLockIfAbsent(addr);
         synchronized (this.lockMap.get(addr)) {
             if (this.clientServers.containsKey(addr)) {
                 return;
             }
             NettyClientServer clientServer = new NettyClientServer(this.serializer);
-            // 初始化一个client 客户端
-            clientServer.init(addr, this.respPool, this.healthList, this.subHealthList);
+            clientServer.init(addr, new ClientHandler(respPool, this.subHealthList));
             this.clientServers.put(addr, clientServer);
         }
     }
 
-    private void setIfLockAbsent(String addr) {
+    private void setLockIfAbsent(String addr) {
         if (this.lockMap.containsKey(addr)) {
             return;
         }

@@ -5,6 +5,7 @@ import io.daiwei.rpc.stub.net.Client;
 import io.daiwei.rpc.stub.net.common.ClientInvokerCore;
 import io.daiwei.rpc.stub.net.common.ConnectServer;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,6 +41,10 @@ public class InvokerUnit {
 
     public ClientInvokerCore getClientCore() {
         return this.clientCore;
+    }
+
+    public List<String> filterSubHealth(List<String> urls) {
+        return this.clientCore.removeSubHealthUrl(urls);
     }
 
 }

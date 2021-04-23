@@ -2,6 +2,7 @@ package io.daiwei.rpc.stub.net.common;
 
 import io.daiwei.rpc.serializer.RpcSerializer;
 import io.daiwei.rpc.stub.common.RpcSendable;
+import io.daiwei.rpc.stub.net.client.ClientHandler;
 import io.daiwei.rpc.stub.net.params.RpcFutureResp;
 import io.daiwei.rpc.stub.net.params.RpcRequest;
 import io.netty.channel.Channel;
@@ -21,7 +22,7 @@ public abstract class ConnectServer implements RpcSendable {
 
     protected Integer port;
 
-    public abstract void init(String address, Map<String, RpcFutureResp> respPool, List<String> healthUrls, List<String> subHealthUrls);
+    public abstract void init(String address, ClientHandler clientHandler);
 
     public abstract void close();
 

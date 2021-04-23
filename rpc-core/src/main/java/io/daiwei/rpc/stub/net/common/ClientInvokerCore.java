@@ -6,6 +6,7 @@ import io.daiwei.rpc.stub.net.Client;
 import io.daiwei.rpc.stub.net.params.RpcFutureResp;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,8 +20,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public abstract class ClientInvokerCore implements ConnectionManager {
 
     protected final Map<String, ConnectServer> clientServers = new ConcurrentHashMap<>();
-
-    protected final List<String> healthList = new CopyOnWriteArrayList<>();
 
     protected final List<String> subHealthList = new CopyOnWriteArrayList<>();
 
@@ -42,8 +41,13 @@ public abstract class ClientInvokerCore implements ConnectionManager {
             this.clientServers.get(conn).close();
         }
         this.clientServers.remove(conn);
-        this.healthList.remove(conn);
         this.subHealthList.remove(conn);
+    }
+
+    public List<String> removeSubHealthUrl(List<String> urls) {
+        List<String> availableUrls = new ArrayList<>(urls);
+        availableUrls.removeAll(this.subHealthList);
+        return availableUrls;
     }
 
     public void stopClientServer() {

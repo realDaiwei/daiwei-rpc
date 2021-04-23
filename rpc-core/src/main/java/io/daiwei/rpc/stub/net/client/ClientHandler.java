@@ -32,13 +32,10 @@ public class ClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
 
     private final Map<String, RpcFutureResp> respPool;
 
-    private final List<String> healthUrls;
-
     private final List<String> subHealthUrls;
 
-    public ClientHandler(Map<String, RpcFutureResp> respPool, List<String> healthUrls, List<String> subHealthUrls) {
+    public ClientHandler(Map<String, RpcFutureResp> respPool, List<String> subHealthUrls) {
         this.respPool = respPool;
-        this.healthUrls = healthUrls;
         this.subHealthUrls = subHealthUrls;
     }
 
@@ -84,15 +81,11 @@ public class ClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
         boolean health = healthInfo.getLatency() < 50 && healthInfo.getCpuLoadPercent().compareTo(new BigDecimal("0.70")) < 0
                 && healthInfo.getMemLoadPercent().compareTo(new BigDecimal("0.75")) < 0;
         if (health) {
-            if (!healthUrls.contains(serverAddr)) {
-                healthUrls.add(serverAddr);
-            }
             subHealthUrls.remove(serverAddr);
         } else {
             if (!subHealthUrls.contains(serverAddr)) {
                 subHealthUrls.add(serverAddr);
             }
-            healthUrls.remove(serverAddr);
         }
     }
 

@@ -82,8 +82,4 @@ public class RpcInvokerFactory {
             e.printStackTrace();
         }
     }
-
-    private List<String> route(List<String> urls) {
-        return urls;
-    }
 }
