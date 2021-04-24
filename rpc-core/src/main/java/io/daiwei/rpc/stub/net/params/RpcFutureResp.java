@@ -70,7 +70,7 @@ public class RpcFutureResp implements Future<RpcResponse> {
             }
             if (!isDone()) {
                 log.error("daiwei-rpc invoke timeout.");
-                resp.setException(new TimeoutException("inoke timeout"));
+                resp = RpcResponse.builder().exception(new TimeoutException("inoke timeout")).build();
             }
         } finally {
             lock.unlock();

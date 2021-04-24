@@ -50,12 +50,20 @@ public abstract class ClientInvokerCore implements ConnectionManager {
         return availableUrls;
     }
 
+    public void addUrlToSubHealth(String url) {
+        this.subHealthList.add(url);
+    }
+
     public void stopClientServer() {
         clientServers.values().forEach(connectServer -> {
             connectServer.close();
             log.info("connectServer[{}] close successfully", connectServer);
         });
         clientServers.values().stream().findFirst().ifPresent(ConnectServer::cleanStaticResource);
+    }
+
+    public void removeTimeoutRespFromPool(String reqId) {
+        this.respPool.remove(reqId);
     }
 
 }

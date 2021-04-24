@@ -46,5 +46,4 @@ public class InvokerUnit {
     public List<String> filterSubHealth(List<String> urls) {
         return this.clientCore.removeSubHealthUrl(urls);
     }
-
 }

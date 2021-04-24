@@ -26,4 +26,8 @@ public class RpcRefBean {
 
     private String version;
 
+    private List<Class<?>> retryExceptions;
+
+    private Integer retryTimes = 3;
+
 }

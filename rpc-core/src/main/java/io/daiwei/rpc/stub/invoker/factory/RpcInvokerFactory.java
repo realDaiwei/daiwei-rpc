@@ -12,7 +12,9 @@ import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatchers;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by Daiwei on 2021/3/28
@@ -55,8 +57,8 @@ public class RpcInvokerFactory {
      */
     public <T> T createStubByClass(Class<T> clazz) {
         List<String> strings = registerUnit.pullAvailableUrls(clazz);
-        RpcRefBean refBean = RpcRefBean.builder().targetFace(clazz).availUrls(strings).version("1.0")
-                .accessToken("").timeout(60).build();
+        RpcRefBean refBean = RpcRefBean.builder().targetFace(clazz).availUrls(strings).version("1.0").retryTimes(1)
+                .accessToken("").timeout(10).retryExceptions(Collections.singletonList(TimeoutException.class)).build();
         Object stub = createStub(refBean);
         return clazz.cast(stub);
     }

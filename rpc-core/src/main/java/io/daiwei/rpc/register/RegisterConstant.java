@@ -7,7 +7,7 @@ public class RegisterConstant {
 
     private RegisterConstant() {}
 
-    public static final String DAIWEI_RPC_NAME_SPACE = "daiwei-rpc-name-space";
+    public static final String DAIWEI_RPC_NAME_SPACE = "daiwei-rpc-namespace";
 
     public static final String RPC_SERVICE = "service";
 

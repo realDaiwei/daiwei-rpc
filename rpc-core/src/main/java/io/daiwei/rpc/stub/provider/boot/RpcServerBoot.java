@@ -19,14 +19,14 @@ public class RpcServerBoot {
 
     private RpcServerBoot(int port, String zkConnStr) {
         this.availablePort = port;
-        this.registerUnit = new ProviderRegisterUnit(zkConnStr);
+        this.registerUnit = new ProviderRegisterUnit(zkConnStr, this.availablePort);
         this.serverStubUnit = new ProviderServerUnit(port);
     }
 
     private RpcServerBoot(String zkConnStr) {
         int defaultPort = 7248;
         this.availablePort = NetUtil.findAvailablePort(defaultPort);
-        this.registerUnit = new ProviderRegisterUnit(zkConnStr);
+        this.registerUnit = new ProviderRegisterUnit(zkConnStr, this.availablePort);
         this.serverStubUnit = new ProviderServerUnit(this.availablePort);
     }
 

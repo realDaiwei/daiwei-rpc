@@ -41,7 +41,7 @@ public class ProviderInvoker extends ProviderInvokerCore {
 
     @Override
     public boolean valid(RpcRequest req) {
-        return (req.getRequestId().startsWith(NetConstant.HEART_BEAT_REQ_ID) || req.getRequestId().startsWith(NetConstant.IDLE_CHANNEL_CLOSE_REQ_ID))
+        return  (req.getRequestId().startsWith(NetConstant.HEART_BEAT_REQ_ID) || req.getRequestId().startsWith(NetConstant.IDLE_CHANNEL_CLOSE_REQ_ID))
                 || (req.getCreateTimeMillis() + REQ_TIME_OUT >= System.currentTimeMillis() && req.getRequestId() != null
                 && req.getRequestId().length() != 0 && req.getClassName() != null && req.getClassName().length() != 0
                 && req.getMethodName() != null && req.getMethodName().length() != 0 && req.getClassType() != null

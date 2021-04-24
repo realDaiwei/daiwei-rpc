@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * Created by Daiwei on 2021/3/30
@@ -28,4 +29,17 @@ public class RpcRequest implements Serializable {
 
     private long timeout;
 
+    @Override
+    public String toString() {
+        return "RpcRequest{" +
+                "requestId='" + requestId + '\'' +
+                ", className='" + className + '\'' +
+                ", methodName='" + methodName + '\'' +
+                ", params=" + Arrays.toString(params) +
+                ", classType=" + classType +
+                ", createTimeMillis=" + createTimeMillis +
+                ", accessToken='" + accessToken + '\'' +
+                ", timeout=" + timeout +
+                '}';
+    }
 }

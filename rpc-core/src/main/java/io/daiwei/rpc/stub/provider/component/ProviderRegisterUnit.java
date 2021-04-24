@@ -16,6 +16,7 @@ import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.zookeeper.CreateMode;
+import sun.nio.ch.Net;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -27,8 +28,11 @@ import java.util.Collections;
 @Slf4j
 public class ProviderRegisterUnit extends ZkRpcRegister {
 
-    public ProviderRegisterUnit(String zkConnStr) {
+    private final int port;
+
+    public ProviderRegisterUnit(String zkConnStr, int port) {
         this.zkConnStr = zkConnStr;
+        this.port = port;
         this.init();
         this.start();
         this.registerListeners();
@@ -75,7 +79,7 @@ public class ProviderRegisterUnit extends ZkRpcRegister {
             @Override
             public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
                 if (event.getType() == PathChildrenCacheEvent.Type.CHILD_REMOVED
-                        && client.getState() != CuratorFrameworkState.STOPPED) {
+                        && client.getState() != CuratorFrameworkState.STOPPED && isSelfRemoved(event.getData().getPath())) {
                     client.create().withMode(CreateMode.EPHEMERAL).forPath(event.getData().getPath(), "provider".getBytes(StandardCharsets.UTF_8));
                 }
             }
@@ -92,5 +96,10 @@ public class ProviderRegisterUnit extends ZkRpcRegister {
         if (interfaces.length != 1) {
             throw new DaiweiRpcException("find more than one interfaces of " + clazz.getCanonicalName());
         }
+    }
+
+    private boolean isSelfRemoved(String zkDataPath) {
+        String ipAndPort = zkDataPath.substring(zkDataPath.lastIndexOf(File.separator));
+        return File.separator.concat(NetUtil.getIpAddress()).concat(":").concat(String.valueOf(port)).equals(ipAndPort);
     }
 }

@@ -29,8 +29,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class ClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
 
-    private static final Map<String, Integer> IDLE_CONN_MAP = new ConcurrentHashMap<>();
-
     private final Map<String, RpcFutureResp> respPool;
 
     private final List<String> subHealthUrls;
@@ -51,17 +49,19 @@ public class ClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
                 judgeHealth((SystemHealthInfo) msg.getData(), serverAddr);
                 return;
             }
-            if (msg.getRequestId().startsWith(NetConstant.IDLE_CHANNEL_CLOSE_RESP_ID)) {
-                log.debug("channel[{}] close!", serverAddr);
-                ctx.close();
-                return;
-            }
+            // 极端情况下 如果 channel 关闭的时间 小于调用超时时间 * 重试次数，
+            // 这将导致方法还没正常返回，channel 已经关闭了
+//            if (msg.getRequestId().startsWith(NetConstant.IDLE_CHANNEL_CLOSE_RESP_ID)) {
+//                if (msg.getCode() == 0) {
+//                    log.debug("channel[{}] close!", serverAddr);
+//                    ctx.close();
+//                }
+//                return;
+//            }
             RpcFutureResp resp = respPool.get(msg.getRequestId());
-            if (resp == null) {
-                throw new DaiweiRpcException("request is not sent from this client");
+            if (resp != null) {
+                resp.RespBackBellRing(msg);
             }
-            IDLE_CONN_MAP.put(serverAddr, 0);
-            resp.RespBackBellRing(msg);
         });
     }
 
@@ -75,22 +75,12 @@ public class ClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
             log.debug("send heart beat request");
-            String serverAddr = ctx.channel().remoteAddress().toString().substring(1);
-            Integer times = IDLE_CONN_MAP.get(serverAddr);
-            if (null == times || times < 5) {
-                ctx.channel().writeAndFlush(HeartBeat.healthReq());
-                return;
-            }
-            subHealthUrls.remove(serverAddr);
-            clientServers.remove(serverAddr);
-            IDLE_CONN_MAP.put(serverAddr, 0);
-            ctx.channel().writeAndFlush(HeartBeat.channelCloseReq());
+            ctx.channel().writeAndFlush(HeartBeat.healthReq());
         }
         super.userEventTriggered(ctx, evt);
     }
 
     private void judgeHealth(SystemHealthInfo healthInfo, String serverAddr) {
-        IDLE_CONN_MAP.put(serverAddr, IDLE_CONN_MAP.containsKey(serverAddr) ? IDLE_CONN_MAP.get(serverAddr) + 1 : 0);
         boolean health = healthInfo.getLatency() < 50 && healthInfo.getCpuLoadPercent().compareTo(new BigDecimal("0.70")) < 0
                 && healthInfo.getMemLoadPercent().compareTo(new BigDecimal("0.75")) < 0;
         if (health) {

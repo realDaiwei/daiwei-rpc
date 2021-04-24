@@ -7,6 +7,7 @@ import io.daiwei.rpc.service.UserService;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Daiwei on 2021/4/16
@@ -19,7 +20,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findByUser(Long id) {
+    public User findByUser(Long id) throws InterruptedException {
         ClassInfo info = ClassInfo.builder().grade(2).schoolName("hello school").stuMap(Collections.singletonMap("daiwei", "daiwei"))
                 .nums(Arrays.asList(BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.TEN)).build();
         return User.builder().id(id).username("daiwei").age(26).info(info).build();

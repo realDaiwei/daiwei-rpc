@@ -9,5 +9,5 @@ public interface UserService {
 
     void sayHello(String name);
 
-    User findByUser(Long id);
+    User findByUser(Long id) throws InterruptedException;
 }

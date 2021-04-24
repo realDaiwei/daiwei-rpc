@@ -47,21 +47,13 @@ public class InvokerRegisterUnit extends ZkRpcRegister {
         if (availPathMap.containsKey(clazzName)) {
             return availPathMap.get(clazzName);
         }
-        List<String> availPath = new ArrayList<>();
+        List<String> availPath = new CopyOnWriteArrayList<>();
         try {
             Stat stat = client.checkExists().forPath(File.separator + clazzName);
             if (stat != null) {
-                availPath = client.getChildren().forPath(File.separator + clazzName);
-                for (String s : availPath) {
-                    client.getData().usingWatcher((Watcher) watchedEvent -> {
-                        if (availPathMap.containsKey(clazzName)) {
-                            availPathMap.get(clazzName).remove(s);
-                        }
-                    }).forPath(File.separator + clazzName + File.separator + s);
-                }
+                availPath = new CopyOnWriteArrayList<>(client.getChildren().forPath(File.separator + clazzName));
                 if (availPath.size() != 0) {
-                    CopyOnWriteArrayList<String> list = new CopyOnWriteArrayList<>(availPath);
-                    availPathMap.putIfAbsent(clazzName, list);
+                    availPathMap.putIfAbsent(clazzName, availPath);
                 } else {
                     throw new DaiweiRpcException("no available remote service found for " + clazzName +".");
                 }
@@ -96,5 +88,9 @@ public class InvokerRegisterUnit extends ZkRpcRegister {
             }
         }).build();
         registerListeners(Collections.singletonList(listener));
+    }
+
+    public List<String> findAvailableUrlsByService(String service) {
+        return this.availPathMap.get(service);
     }
 }

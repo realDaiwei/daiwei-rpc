@@ -88,8 +88,13 @@ public class NettyClientServer extends ConnectServer {
     @Override
     public void sendAsync(Object request) {
         ThreadPoolUtil.defaultRpcClientExecutor().execute(() -> {
-            channel.writeAndFlush(request);
+            try {
+                channel.writeAndFlush(request);
+            } catch (Exception e) {
+                throw e;
+            }
         });
+
     }
 
     @Override

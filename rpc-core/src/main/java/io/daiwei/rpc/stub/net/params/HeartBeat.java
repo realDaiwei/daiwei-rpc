@@ -3,14 +3,13 @@ package io.daiwei.rpc.stub.net.params;
 import io.daiwei.rpc.stub.net.NetConstant;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 /**
  * Created by Daiwei on 2021/4/22
  */
 public final class HeartBeat {
 
-    public static final int BEAT_INTERVAL = 3;
+    public static final int BEAT_INTERVAL = 30;
 
     public static RpcRequest healthReq() {
         return RpcRequest.builder().requestId(NetConstant.HEART_BEAT_REQ_ID).createTimeMillis(System.currentTimeMillis())

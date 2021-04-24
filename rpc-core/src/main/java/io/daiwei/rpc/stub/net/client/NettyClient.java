@@ -6,7 +6,6 @@ import io.daiwei.rpc.stub.net.params.RpcFutureResp;
 import io.daiwei.rpc.stub.net.params.RpcRequest;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by Daiwei on 2021/4/11
@@ -17,15 +16,13 @@ public class NettyClient implements Client {
 
     private final Map<String, RpcFutureResp> respPool;
 
-
     public NettyClient(ConnectServer connectServer, Map<String, RpcFutureResp> respPool) {
         this.connectServer = connectServer;
         this.respPool = respPool;
     }
 
     @Override
-    public RpcFutureResp sendAsync(RpcRequest request) {
-        // TODO: 2021/4/13 做一个 failover
+    public RpcFutureResp send(RpcRequest request) {
         RpcFutureResp resp = new RpcFutureResp();
         this.respPool.put(request.getRequestId(), resp);
         connectServer.sendAsync(request);
