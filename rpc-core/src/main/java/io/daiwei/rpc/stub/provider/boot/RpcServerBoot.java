@@ -32,10 +32,16 @@ public class RpcServerBoot {
 
     public void run() {
         serverStubUnit.afterSetProperties();
+        Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
     }
 
     public static ServerBuilder builder() {
         return new ServerBuilder();
+    }
+
+    private void stop() {
+        this.registerUnit.stop();
+        this.serverStubUnit.stop();
     }
 
     public static class ServerBuilder {

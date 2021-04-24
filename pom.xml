@@ -22,7 +22,6 @@
         <lombok.version>1.18.18</lombok.version>
         <log.version>1.7.30</log.version>
         <log.core.version>2.12.1</log.core.version>
-        <log.log4j.verion>1.7.30</log.log4j.verion>
         <cglib.version>3.2.4</cglib.version>
         <reflect.version>0.9.11</reflect.version>
         <guava.version>29.0-jre</guava.version>

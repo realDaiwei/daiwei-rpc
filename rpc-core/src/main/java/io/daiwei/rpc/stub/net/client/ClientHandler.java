@@ -53,8 +53,6 @@ public class ClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
             }
             if (msg.getRequestId().startsWith(NetConstant.IDLE_CHANNEL_CLOSE_RESP_ID)) {
                 log.debug("channel[{}] close!", serverAddr);
-                subHealthUrls.remove(serverAddr);
-                clientServers.remove(serverAddr);
                 ctx.close();
                 return;
             }
@@ -79,7 +77,14 @@ public class ClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
             log.debug("send heart beat request");
             String serverAddr = ctx.channel().remoteAddress().toString().substring(1);
             Integer times = IDLE_CONN_MAP.get(serverAddr);
-            ctx.channel().writeAndFlush(null != times && times > 10 ? HeartBeat.channelCloseReq() : HeartBeat.healthReq());
+            if (null == times || times < 5) {
+                ctx.channel().writeAndFlush(HeartBeat.healthReq());
+                return;
+            }
+            subHealthUrls.remove(serverAddr);
+            clientServers.remove(serverAddr);
+            IDLE_CONN_MAP.put(serverAddr, 0);
+            ctx.channel().writeAndFlush(HeartBeat.channelCloseReq());
         }
         super.userEventTriggered(ctx, evt);
     }
@@ -95,7 +100,6 @@ public class ClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
                 subHealthUrls.add(serverAddr);
             }
         }
-        log.debug(Arrays.toString(subHealthUrls.toArray()));
     }
 
 

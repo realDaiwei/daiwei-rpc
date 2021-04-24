@@ -5,6 +5,7 @@ import io.daiwei.rpc.register.RpcRegister;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.imps.CuratorFrameworkState;
 import org.apache.curator.framework.recipes.cache.CuratorCache;
 import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
@@ -12,6 +13,7 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Daiwei on 2021/4/18
@@ -32,12 +34,11 @@ public abstract class ZkRpcRegister implements RpcRegister {
     @Override
     public void start() {
         client.start();
-        Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
     }
 
     @Override
     public void stop() {
-        if (this.client != null) {
+        if (this.client != null && CuratorFrameworkState.STOPPED != this.client.getState()) {
             this.client.close();
         }
     }

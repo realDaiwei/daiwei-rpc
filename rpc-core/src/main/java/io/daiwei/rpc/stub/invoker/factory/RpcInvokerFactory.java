@@ -73,10 +73,10 @@ public class RpcInvokerFactory {
         }
     }
 
-    public void stop() {
+    private void stop() {
         try {
-            invokerUnit.stop();
             registerUnit.stop();
+            invokerUnit.stop();
             ThreadPoolUtil.shutdownExistsPools();
         } catch (Exception e) {
             e.printStackTrace();

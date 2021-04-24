@@ -23,6 +23,10 @@ public class ProviderServerUnit {
         this.serverHub.start();
     }
 
+    public void stop() {
+        this.serverHub.stop();
+    }
+
     public boolean isActive() {
         return this.serverHub.isActive();
     }

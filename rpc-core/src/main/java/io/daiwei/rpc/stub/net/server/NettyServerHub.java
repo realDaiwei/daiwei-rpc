@@ -32,11 +32,15 @@ public class NettyServerHub implements Server {
                 new Thread(() -> {
                     this.nettyServer.run(this.invokerCore);
                 }, "daiwei-rpc-server-thread").start();
-                Runtime.getRuntime().addShutdownHook(new Thread(() -> this.nettyServer.close()));
             } catch (Exception e) {
                 log.error("error!", e);
             }
         }
+    }
+
+    @Override
+    public void stop() {
+        this.nettyServer.close();
     }
 
     @Override

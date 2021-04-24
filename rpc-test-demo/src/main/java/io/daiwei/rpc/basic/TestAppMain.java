@@ -17,7 +17,7 @@ import java.util.Arrays;
  */
 public class TestAppMain {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 //        rpcRefBean.setFinalAddr("127.0.0.1:7248");
 //        rpcRefBean.setAccessToken("");
 ////        rpcRefBean.setAvailAddr(Arrays.asList("127.0.0.1:7248"));
@@ -42,7 +42,10 @@ public class TestAppMain {
 //            System.out.println(user);
 //        }
 //        System.out.println(System.currentTimeMillis() - start);
-        while(true) {}
+        Thread.sleep(35 * 1000);
+        User byUser = userService.findByUser(10L);
+        System.out.println(byUser);
+//        while(true) {}
 //        factory.stop();
     }
 }
