@@ -29,8 +29,6 @@ public abstract class ClientInvokerCore implements ConnectionManager {
 
     protected RpcSerializer serializer;
 
-    public abstract Client getClient(String addr);
-
     public void setSerializer(RpcSerializer serializer) {
         this.serializer = serializer;
     }

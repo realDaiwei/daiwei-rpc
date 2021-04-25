@@ -14,9 +14,9 @@ import java.util.List;
 @Slf4j
 public class NettyDecoder extends ByteToMessageDecoder {
 
-    private Class<?> clazz;
+    private final Class<?> clazz;
 
-    private RpcSerializer serializer;
+    private final RpcSerializer serializer;
 
     public NettyDecoder(Class<?> clazz, RpcSerializer serializer) {
         this.clazz = clazz;

@@ -53,7 +53,7 @@ public class DelegateInvokerMethod {
         List<String> healthUrls = invokerUnit.filterSubHealth(this.urls);
         RpcResponse rpcResponse = null;
         Client client = null;
-        int time = 0;
+        int retryTimes = 0;
         try {
             while (rpcResponse == null || rpcResponse.getException() != null) {
                 String url = loadBalance.select(healthUrls);
@@ -63,9 +63,9 @@ public class DelegateInvokerMethod {
                 request.setCreateTimeMillis(System.currentTimeMillis());
                 RpcFutureResp rpcFutureResp = client.send(request);
                 rpcResponse = rpcFutureResp.get(request.getTimeout(), TimeUnit.SECONDS);
-                if (rpcResponse.getException() == null || time++ >= this.retryTimes
+                if (rpcResponse.getException() == null || retryTimes++ >= this.retryTimes
                         || !this.retryException.contains(rpcResponse.getException().getClass())) {
-                    if (time > 0 && rpcResponse.getException() == null) {
+                    if (retryTimes > 0 && rpcResponse.getException() == null) {
                         log.debug("rpc auto invoke failover success");
                     }
                     break;

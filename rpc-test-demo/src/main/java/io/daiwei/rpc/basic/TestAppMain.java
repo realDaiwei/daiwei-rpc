@@ -1,6 +1,5 @@
 package io.daiwei.rpc.basic;
 
-import com.sun.tools.internal.xjc.reader.xmlschema.bindinfo.BIConversion;
 import io.daiwei.rpc.entity.User;
 import io.daiwei.rpc.service.UserService;
 import io.daiwei.rpc.service.impl.UserServiceImpl;

@@ -21,6 +21,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByUser(Long id) throws InterruptedException {
+        Thread.sleep(10 * 1000);
         ClassInfo info = ClassInfo.builder().grade(2).schoolName("hello school").stuMap(Collections.singletonMap("daiwei", "daiwei"))
                 .nums(Arrays.asList(BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.TEN)).build();
         return User.builder().id(id).username("daiwei").age(26).info(info).build();

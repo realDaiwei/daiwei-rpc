@@ -15,7 +15,7 @@ public class DefaultLoadBalance implements LoadBalance {
 
     @Override
     public String select(List<String> urls) {
-        if (urls.size() > 0) {
+        if (!urls.isEmpty()) {
             return urls.get(cnt.getAndIncrement() % urls.size());
         } else {
             throw new DaiweiRpcException("no available server url");

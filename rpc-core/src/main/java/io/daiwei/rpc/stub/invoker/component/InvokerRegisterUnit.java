@@ -4,6 +4,7 @@ import io.daiwei.rpc.exception.DaiweiRpcException;
 import io.daiwei.rpc.register.RegisterConstant;
 import io.daiwei.rpc.register.zk.ZkRpcRegister;
 import io.daiwei.rpc.stub.common.ConnectionManager;
+import io.daiwei.rpc.stub.net.NetConstant;
 import io.daiwei.rpc.stub.net.client.NettyClientServer;
 import io.daiwei.rpc.stub.net.common.ConnectServer;
 import org.apache.curator.framework.CuratorFramework;
@@ -49,10 +50,10 @@ public class InvokerRegisterUnit extends ZkRpcRegister {
         }
         List<String> availPath = new CopyOnWriteArrayList<>();
         try {
-            Stat stat = client.checkExists().forPath(File.separator + clazzName);
+            Stat stat = client.checkExists().forPath(NetConstant.FILE_SEPARATOR + clazzName);
             if (stat != null) {
-                availPath = new CopyOnWriteArrayList<>(client.getChildren().forPath(File.separator + clazzName));
-                if (availPath.size() != 0) {
+                availPath = new CopyOnWriteArrayList<>(client.getChildren().forPath(NetConstant.FILE_SEPARATOR + clazzName));
+                if (!availPath.isEmpty()) {
                     availPathMap.putIfAbsent(clazzName, availPath);
                 } else {
                     throw new DaiweiRpcException("no available remote service found for " + clazzName +".");
@@ -66,11 +67,11 @@ public class InvokerRegisterUnit extends ZkRpcRegister {
 
     @Override
     public void registerListeners() {
-        CuratorCacheListener listener = CuratorCacheListener.builder().forPathChildrenCache(File.separator, client, (client, event) -> {
+        CuratorCacheListener listener = CuratorCacheListener.builder().forPathChildrenCache(NetConstant.FILE_SEPARATOR, client, (client, event) -> {
             if (!Arrays.asList(PathChildrenCacheEvent.Type.CHILD_REMOVED, PathChildrenCacheEvent.Type.CHILD_ADDED).contains(event.getType())) {
                 return;
             }
-            String[] str = event.getData().getPath().split(File.separator);
+            String[] str = event.getData().getPath().split(NetConstant.FILE_SEPARATOR);
             if (RegisterConstant.RPC_SERVICE.equals(new String(event.getData().getData(), StandardCharsets.UTF_8))) {
                 if (!availPathMap.containsKey(str[1])) {
                     availPathMap.put(str[1], new CopyOnWriteArrayList<>());
@@ -88,9 +89,5 @@ public class InvokerRegisterUnit extends ZkRpcRegister {
             }
         }).build();
         registerListeners(Collections.singletonList(listener));
-    }
-
-    public List<String> findAvailableUrlsByService(String service) {
-        return this.availPathMap.get(service);
     }
 }

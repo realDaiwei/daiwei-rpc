@@ -2,6 +2,7 @@ package io.daiwei.rpc.register.zk;
 
 import io.daiwei.rpc.register.RegisterConstant;
 import io.daiwei.rpc.register.RpcRegister;
+import io.daiwei.rpc.stub.net.NetConstant;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -56,7 +57,7 @@ public abstract class ZkRpcRegister implements RpcRegister {
 
     @Override
     public final void registerListeners(List<CuratorCacheListener> listeners) {
-        CuratorCache cache = CuratorCache.builder(client, File.separator).build();
+        CuratorCache cache = CuratorCache.builder(client, NetConstant.FILE_SEPARATOR).build();
         for (CuratorCacheListener listener : listeners) {
             cache.listenable().addListener(listener);
         }

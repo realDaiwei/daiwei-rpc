@@ -3,6 +3,7 @@ package io.daiwei.rpc.stub.provider.component;
 import io.daiwei.rpc.exception.DaiweiRpcException;
 import io.daiwei.rpc.register.RegisterConstant;
 import io.daiwei.rpc.register.zk.ZkRpcRegister;
+import io.daiwei.rpc.stub.net.NetConstant;
 import io.daiwei.rpc.stub.provider.invoke.RpcProviderProxyPool;
 import io.daiwei.rpc.util.NetUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -58,11 +59,11 @@ public class ProviderRegisterUnit extends ZkRpcRegister {
         try {
             serverCheck(clazz);
             Class<?> service = clazz.getInterfaces()[0];
-            if (null == client.checkExists().forPath(File.separator + service.getCanonicalName())) {
-                client.create().withMode(CreateMode.PERSISTENT).forPath(File.separator + service.getCanonicalName(), RegisterConstant.RPC_SERVICE.getBytes(StandardCharsets.UTF_8));
+            if (null == client.checkExists().forPath(NetConstant.FILE_SEPARATOR + service.getCanonicalName())) {
+                client.create().withMode(CreateMode.PERSISTENT).forPath(NetConstant.FILE_SEPARATOR + service.getCanonicalName(), RegisterConstant.RPC_SERVICE.getBytes(StandardCharsets.UTF_8));
             }
             String addr = NetUtil.getIpAddress().concat(":").concat(String.valueOf(port));
-            client.create().withMode(CreateMode.EPHEMERAL).forPath(File.separator + service.getCanonicalName() + File.separator + addr, RegisterConstant.RPC_PROVIDER.getBytes(StandardCharsets.UTF_8));
+            client.create().withMode(CreateMode.EPHEMERAL).forPath(NetConstant.FILE_SEPARATOR + service.getCanonicalName() + NetConstant.FILE_SEPARATOR + addr, RegisterConstant.RPC_PROVIDER.getBytes(StandardCharsets.UTF_8));
         } catch (Exception exception) {
             log.error("create zk node failed.", exception);
             exception.printStackTrace();
@@ -75,7 +76,7 @@ public class ProviderRegisterUnit extends ZkRpcRegister {
      */
     @Override
     public void registerListeners() {
-        CuratorCacheListener listener = CuratorCacheListener.builder().forPathChildrenCache(File.separator, client, new PathChildrenCacheListener() {
+        CuratorCacheListener listener = CuratorCacheListener.builder().forPathChildrenCache(NetConstant.FILE_SEPARATOR, client, new PathChildrenCacheListener() {
             @Override
             public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
                 if (event.getType() == PathChildrenCacheEvent.Type.CHILD_REMOVED
@@ -99,7 +100,7 @@ public class ProviderRegisterUnit extends ZkRpcRegister {
     }
 
     private boolean isSelfRemoved(String zkDataPath) {
-        String ipAndPort = zkDataPath.substring(zkDataPath.lastIndexOf(File.separator));
-        return File.separator.concat(NetUtil.getIpAddress()).concat(":").concat(String.valueOf(port)).equals(ipAndPort);
+        String ipAndPort = zkDataPath.substring(zkDataPath.lastIndexOf(NetConstant.FILE_SEPARATOR));
+        return NetConstant.FILE_SEPARATOR.concat(NetUtil.getIpAddress()).concat(":").concat(String.valueOf(port)).equals(ipAndPort);
     }
 }
