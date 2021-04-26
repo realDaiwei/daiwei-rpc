@@ -14,7 +14,8 @@ public class DefaultLoadBalance implements LoadBalance {
     private final AtomicInteger cnt = new AtomicInteger();
 
     @Override
-    public String select(List<String> urls) {
+    public String select(List<String> healthUrls, List<String> allAvailableUrls) {
+        List<String> urls = healthUrls.isEmpty() ? allAvailableUrls : healthUrls;
         if (!urls.isEmpty()) {
             return urls.get(cnt.getAndIncrement() % urls.size());
         } else {

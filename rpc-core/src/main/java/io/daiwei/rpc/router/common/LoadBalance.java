@@ -8,5 +8,5 @@ import java.util.List;
  */
 public interface LoadBalance {
 
-    String select(List<String> urls);
+    String select(List<String> healthUrls, List<String> allAvailableUrls);
 }

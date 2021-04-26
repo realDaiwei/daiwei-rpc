@@ -6,7 +6,11 @@ import lombok.Builder;
 import lombok.Data;
 import io.daiwei.rpc.stub.net.Client;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 /**
  * 本地代理实例info 聚合对象
@@ -22,7 +26,7 @@ public class RpcRefBean {
 
     private String accessToken;
 
-    private long timeout = 60;
+    private long timeout = 60 * 1000;
 
     private String version;
 

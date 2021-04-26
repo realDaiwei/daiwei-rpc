@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  */
 public final class HeartBeat {
 
-    public static final int BEAT_INTERVAL = 30;
+    public static final int BEAT_INTERVAL = 10;
 
     public static RpcRequest healthReq() {
         return RpcRequest.builder().requestId(NetConstant.HEART_BEAT_REQ_ID).createTimeMillis(System.currentTimeMillis())
@@ -27,8 +27,13 @@ public final class HeartBeat {
                 .createTimeMillis(System.currentTimeMillis()).build();
     }
 
-    public static RpcResponse channelCloseResp() {
+    public static RpcResponse channelCloseRespSuccess() {
         return RpcResponse.builder().code(0)
+                .requestId(NetConstant.IDLE_CHANNEL_CLOSE_RESP_ID).build();
+    }
+
+    public static RpcResponse channelCloseRespFailed() {
+        return RpcResponse.builder().code(-1)
                 .requestId(NetConstant.IDLE_CHANNEL_CLOSE_RESP_ID).build();
     }
 

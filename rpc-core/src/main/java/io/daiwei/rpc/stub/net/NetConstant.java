@@ -1,8 +1,14 @@
 package io.daiwei.rpc.stub.net;
 
+import io.daiwei.rpc.exception.ServerClosingException;
 import org.omg.CORBA.PUBLIC_MEMBER;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 /**
  * 网络层通信 通用常量
@@ -21,4 +27,6 @@ public class NetConstant {
     public static final String IDLE_CHANNEL_CLOSE_RESP_ID = "idle_close_check";
 
     public static final String FILE_SEPARATOR = "/";
+
+    public static final List<Class<?>> RPC_NEED_RETRY_EXS = Collections.singletonList(ServerClosingException.class);
 }

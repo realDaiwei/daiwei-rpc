@@ -20,12 +20,15 @@ public class SystemHealthInfo implements Serializable {
 
     private BigDecimal memLoadPercent;
 
+    private long respSendTime;
+
     public SystemHealthInfo() {}
 
     public SystemHealthInfo(long latency, BigDecimal cpuLoadPercent, BigDecimal memLoadPercent) {
         this.latency = latency;
         this.cpuLoadPercent = cpuLoadPercent;
         this.memLoadPercent = memLoadPercent;
+        this.respSendTime = System.currentTimeMillis();
     }
 
     @Override

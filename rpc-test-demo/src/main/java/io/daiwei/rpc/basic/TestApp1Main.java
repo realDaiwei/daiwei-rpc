@@ -1,0 +1,22 @@
+package io.daiwei.rpc.basic;
+
+import io.daiwei.rpc.entity.User;
+import io.daiwei.rpc.service.UserService;
+import io.daiwei.rpc.stub.invoker.factory.RpcInvokerFactory;
+
+/**
+ * Created by Daiwei on 2021/4/11
+ */
+public class TestApp1Main {
+
+    public static void main(String[] args) throws InterruptedException {
+        RpcInvokerFactory factory = new RpcInvokerFactory("127.0.0.1:2181");
+        UserService userService = factory.createStubByClass(UserService.class);
+        for (int i = 0; i < 1; i++) {
+            User user = userService.findByUser(10L);
+            System.out.println(user);
+        }
+        while(true) {}
+//        factory.stop();
+    }
+}

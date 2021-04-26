@@ -4,6 +4,7 @@ import io.daiwei.rpc.router.common.LoadBalance;
 import io.daiwei.rpc.stub.invoker.component.InvokerUnit;
 import io.daiwei.rpc.stub.invoker.refbean.RpcRefBean;
 import io.daiwei.rpc.stub.net.Client;
+import io.daiwei.rpc.stub.net.NetConstant;
 import io.daiwei.rpc.stub.net.params.RpcFutureResp;
 import io.daiwei.rpc.stub.net.params.RpcRequest;
 import io.daiwei.rpc.stub.net.params.RpcResponse;
@@ -11,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.bytebuddy.implementation.bind.annotation.*;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -40,15 +42,14 @@ public class DelegateInvokerMethod {
         this.urls = refBean.getAvailUrls();
         this.timeout = refBean.getTimeout();
         this.retryTimes = refBean.getRetryTimes();
-        this.retryException = refBean.getRetryExceptions();
-
+        this.retryException = refBean.getRetryExceptions() == null ? new ArrayList<>() : refBean.getRetryExceptions();
+        this.retryException.addAll(NetConstant.RPC_NEED_RETRY_EXS);
     }
 
     @RuntimeType
     public Object interceptor(@This Object target, @AllArguments Object[] args, @Origin Method method) {
         Class<?> iface = target.getClass().getInterfaces()[0];
-        RpcRequest request = RpcRequest.builder()
-                .methodName(method.getName()).classType(iface)
+        RpcRequest request = RpcRequest.builder().methodName(method.getName()).classType(iface)
                 .params(args).className(iface.getCanonicalName()).timeout(this.timeout).build();
         List<String> healthUrls = invokerUnit.filterSubHealth(this.urls);
         RpcResponse rpcResponse = null;
@@ -56,23 +57,21 @@ public class DelegateInvokerMethod {
         int retryTimes = 0;
         try {
             while (rpcResponse == null || rpcResponse.getException() != null) {
-                String url = loadBalance.select(healthUrls);
+                String url = loadBalance.select(healthUrls, this.urls);
                 client = invokerUnit.getInvokeClient(url);
                 String requestId = UUID.randomUUID().toString().replace("-", "");
                 request.setRequestId(requestId);
                 request.setCreateTimeMillis(System.currentTimeMillis());
                 RpcFutureResp rpcFutureResp = client.send(request);
-                rpcResponse = rpcFutureResp.get(request.getTimeout(), TimeUnit.SECONDS);
+                rpcResponse = rpcFutureResp.get(request.getTimeout(), TimeUnit.MILLISECONDS);
                 if (rpcResponse.getException() == null || retryTimes++ >= this.retryTimes
                         || !this.retryException.contains(rpcResponse.getException().getClass())) {
-                    if (retryTimes > 0 && rpcResponse.getException() == null) {
-                        log.debug("rpc auto invoke failover success");
+                    if (retryTimes > 0) {
+                        log.debug("rpc auto failover failed invoke");
                     }
                     break;
                 }
-                invokerUnit.getClientCore().removeTimeoutRespFromPool(requestId);
-                invokerUnit.getClientCore().addUrlToSubHealth(url);
-                healthUrls.remove(url);
+                cleanAfterInvokeFailed(requestId, url, healthUrls);
             }
             if (rpcResponse.getException() != null) {
                 throw new ExecutionException(request.getClassName() + " invoke failed", rpcResponse.getException());
@@ -88,5 +87,12 @@ public class DelegateInvokerMethod {
             }
         }
         return null;
+    }
+
+
+    private void cleanAfterInvokeFailed(String requestId, String url, List<String> healthUrls) {
+        invokerUnit.getClientCore().removeTimeoutRespFromPool(requestId);
+        invokerUnit.getClientCore().addUrlToSubHealth(url);
+        healthUrls.remove(url);
     }
 }
