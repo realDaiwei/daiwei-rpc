@@ -22,7 +22,6 @@ public class NettyServerHub implements Server {
     public NettyServerHub(int port, ProviderInvokerCore invokerCore, RpcSerializer serializer) {
         this.nettyServer = new NettyServer(port, serializer);
         this.invokerCore = invokerCore;
-        invokerCore.setSendable(this.nettyServer);
     }
 
     @Override

@@ -16,7 +16,7 @@ public class TestApp1Main {
             User user = userService.findByUser(10L);
             System.out.println(user);
         }
-        while(true) {}
+        Thread.sleep(300000);
 //        factory.stop();
     }
 }

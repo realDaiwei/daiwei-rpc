@@ -1,7 +1,5 @@
 package io.daiwei.rpc.stub.net.client;
 
-import com.sun.xml.internal.bind.v2.model.core.ID;
-import io.daiwei.rpc.exception.DaiweiRpcException;
 import io.daiwei.rpc.stub.net.NetConstant;
 import io.daiwei.rpc.stub.net.common.ConnectServer;
 import io.daiwei.rpc.stub.net.params.HeartBeat;
@@ -12,17 +10,12 @@ import io.daiwei.rpc.util.ThreadPoolUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.zookeeper.data.Id;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
@@ -35,9 +28,9 @@ import java.util.concurrent.locks.ReentrantLock;
 @Slf4j
 public class ClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
 
-    private static final Map<String, Integer> IDLE_HEART_BEAT_TIMES = new HashMap<>();
-
     private volatile boolean beatReturn;
+
+    private final AtomicInteger idleHeartBeatTimes;
 
     private final Lock lock = new ReentrantLock();
 
@@ -53,6 +46,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
         this.respPool = respPool;
         this.subHealthUrls = subHealthUrls;
         this.clientServers = clientServers;
+        this.idleHeartBeatTimes = new AtomicInteger();
     }
 
     @Override
@@ -62,7 +56,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
             if (!messagePreHandleFilter(ctx.channel(), msg, serverAddr)) {
                 return;
             }
-            IDLE_HEART_BEAT_TIMES.put(serverAddr, 0);
+            idleHeartBeatTimes.set(0);
             RpcFutureResp resp = respPool.get(msg.getRequestId());
             if (resp != null) {
                 resp.RespBackBellRing(msg);
@@ -80,11 +74,11 @@ public class ClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
             String serverAddr = ctx.channel().remoteAddress().toString().substring(1);
-            log.debug("send heart beat request");
-            if (!IDLE_HEART_BEAT_TIMES.containsKey(serverAddr) || IDLE_HEART_BEAT_TIMES.get(serverAddr) < 3) {
-                IDLE_HEART_BEAT_TIMES.put(serverAddr, IDLE_HEART_BEAT_TIMES.get(serverAddr) + 1);
+            if (idleHeartBeatTimes.getAndIncrement() < 5) {
+                log.debug("[daiwei-rpc] send heart beat request");
                 ctx.channel().writeAndFlush(HeartBeat.healthReq());
             } else {
+                log.debug("[daiwei-rpc] send idle channel close request");
                 clientServers.remove(serverAddr);
                 this.subHealthUrls.remove(serverAddr);
                 ctx.channel().writeAndFlush(HeartBeat.channelCloseReq());
@@ -96,7 +90,6 @@ public class ClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
 
     private void judgeHealth(SystemHealthInfo healthInfo, String serverAddr) {
         if (healthInfo.getRespSendTime() + 2000 > System.currentTimeMillis()) {
-            // 超时心跳不处理
             return;
         }
         boolean health = healthInfo.getLatency() < 100 && healthInfo.getCpuLoadPercent().compareTo(new BigDecimal("0.70")) < 0
@@ -108,7 +101,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
                 subHealthUrls.add(serverAddr);
             }
         }
-        log.debug("remote server[{}], health status[{}]", serverAddr, health);
+        log.debug("[daiwei-rpc] remote server[{}], health status[{}]", serverAddr, health);
     }
 
     private boolean messagePreHandleFilter(Channel channel, RpcResponse msg, String serverAddr) {
@@ -121,7 +114,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
             wakeBeatTimeoutChecker();
             if (msg.getCode() == 0) {
                 channel.close();
-                log.debug("idle-channel[{}] close!", serverAddr);
+                log.debug("[daiwei-rpc] idle-channel[{}] close!", serverAddr);
             }
             return false;
         }

@@ -26,7 +26,7 @@ public class ProviderInvoker extends ProviderInvokerCore {
     }
 
     @Override
-    public void requestComingBellRing(RpcRequest request) {
+    public RpcResponse requestComingBellRing(RpcRequest request) {
         RpcResponse.RpcResponseBuilder builder = RpcResponse.builder().requestId(request.getRequestId());
         try {
             Object res = invoke(request);
@@ -35,8 +35,7 @@ public class ProviderInvoker extends ProviderInvokerCore {
             builder.data(null).code(-1).msg(exception.getMessage()).exception(exception);
             exception.printStackTrace();
         }
-        RpcResponse resp = builder.build();
-        this.sendable.sendAsync(resp);
+        return builder.build();
     }
 
     @Override

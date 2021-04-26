@@ -16,7 +16,9 @@ import io.netty.channel.group.ChannelGroup;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Daiwei on 2021/4/13
@@ -28,17 +30,16 @@ public class ServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
 
     private final ChannelGroup channels;
 
-    private final Map<String, ChannelId> reqIdChannelIdMap;
-
     private volatile boolean channelClosing;
 
     private volatile long msgTimeout;
 
+    private final Set<String> reqIds;
 
-    public ServerHandler(ProviderInvokerCore invokerCore, ChannelGroup channels, Map<String, ChannelId> map) {
+    public ServerHandler(ProviderInvokerCore invokerCore, ChannelGroup channels) {
         this.invokerCore = invokerCore;
         this.channels = channels;
-        this.reqIdChannelIdMap = map;
+        this.reqIds = new HashSet<>();
         this.msgTimeout = System.currentTimeMillis();
     }
 
@@ -50,7 +51,9 @@ public class ServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
                     Channel channel = ctx.channel();
                     if (messagePreHandleFilter(channel, msg)) {
                         collectMessageData(channel, msg);
-                        invokerCore.requestComingBellRing(msg);
+                        RpcResponse response = invokerCore.requestComingBellRing(msg);
+                        reqIds.remove(msg.getRequestId());
+                        channel.writeAndFlush(response);
                     }
                 }
             } catch (Exception e) {
@@ -88,7 +91,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
         if (msgTimeout < reqTimeout) {
             msgTimeout = reqTimeout;
         }
-        reqIdChannelIdMap.put(msg.getRequestId(), channel.id());
+        reqIds.add(msg.getRequestId());
     }
 
     /**
@@ -100,13 +103,13 @@ public class ServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
      */
     private boolean messagePreHandleFilter(Channel channel, RpcRequest msg) {
         if (msg.getRequestId().startsWith(NetConstant.HEART_BEAT_REQ_ID)) {
-            log.debug("heart beat request from {}", channel.remoteAddress());
+            log.debug("[daiwei-rpc] heart beat request from {}", channel.remoteAddress());
             channel.writeAndFlush(replyHealthCheck(msg));
             return false;
         } else if (msg.getRequestId().startsWith(NetConstant.IDLE_CHANNEL_CLOSE_REQ_ID)) {
             channelClosing = true;
-            boolean approval = msgTimeout < System.currentTimeMillis();
-            log.debug("idle-channel close asking form {} and server says [{}]", channel.remoteAddress(), approval ? "ok" : "nope");
+            boolean approval = msgTimeout < System.currentTimeMillis() || reqIds.isEmpty();
+            log.debug("[daiwei-rpc] idle-channel close asking form {} and server says [{}]", channel.remoteAddress(), approval ? "ok" : "nope");
             if (approval) {
                 channel.writeAndFlush(HeartBeat.channelCloseRespSuccess());
                 channels.find(channel.id()).close();

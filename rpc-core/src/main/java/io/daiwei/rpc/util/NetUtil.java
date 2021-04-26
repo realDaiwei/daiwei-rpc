@@ -58,7 +58,7 @@ public class NetUtil {
             server.close();
         } catch (IOException e) {
             available = false;
-            log.debug("port[{}] is in use", port);
+            log.debug("[daiwei-rpc] port[{}] is in use", port);
         }
         return available;
     }

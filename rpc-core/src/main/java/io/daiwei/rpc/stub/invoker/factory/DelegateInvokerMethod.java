@@ -67,7 +67,7 @@ public class DelegateInvokerMethod {
                 if (rpcResponse.getException() == null || retryTimes++ >= this.retryTimes
                         || !this.retryException.contains(rpcResponse.getException().getClass())) {
                     if (retryTimes > 0) {
-                        log.debug("rpc auto failover failed invoke");
+                        log.debug("[daiwei-rpc] rpc auto failover failed invoke");
                     }
                     break;
                 }
