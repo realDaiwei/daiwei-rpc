@@ -80,8 +80,8 @@ public class RpcInvokerFactory {
 
     private void stop() {
         try {
-            registerUnit.stop();
             invokerUnit.stop();
+            registerUnit.stop();
             ThreadPoolUtil.shutdownExistsPools();
         } catch (Exception e) {
             e.printStackTrace();

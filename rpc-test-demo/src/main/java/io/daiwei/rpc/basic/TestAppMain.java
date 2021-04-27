@@ -25,7 +25,7 @@ public class TestAppMain {
 //        long start = System.currentTimeMillis();
         RpcInvokerFactory factory = new RpcInvokerFactory("127.0.0.1:2181");
         UserService userService = factory.createStubByClass(UserService.class);
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10000; i++) {
             User user = userService.findByUser(10L);
             System.out.println(user);
 //            Thread.sleep(1000);
@@ -34,13 +34,13 @@ public class TestAppMain {
 //            System.out.println(user);
 //        }
 //        System.out.println(System.currentTimeMillis() - start);
-
+        Thread.sleep(2 * 60 * 1000);
 //        start = System.currentTimeMillis();
 //        UserServiceImpl userService  = new UserServiceImpl();
-//        for (int i = 0; i < 100; i++) {
-//            User user = userService.findByUser(10L);
-//            System.out.println(user);
-//        }
+        for (int i = 0; i < 1000; i++) {
+            User user = userService.findByUser(10L);
+            System.out.println(user);
+        }
 //        System.out.println(System.currentTimeMillis() - start);
 
 //        User byUser = userService.findByUser(10L);

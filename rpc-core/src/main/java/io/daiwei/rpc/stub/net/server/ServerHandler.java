@@ -10,21 +10,22 @@ import io.daiwei.rpc.util.OSHealthUtil;
 import io.daiwei.rpc.util.ThreadPoolUtil;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelId;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.group.ChannelGroup;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Daiwei on 2021/4/13
  */
 @Slf4j
 public class ServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
+
+    private static volatile boolean SERVER_STATUS;
 
     private final ProviderInvokerCore invokerCore;
 
@@ -36,11 +37,14 @@ public class ServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
 
     private final Set<String> reqIds;
 
-    public ServerHandler(ProviderInvokerCore invokerCore, ChannelGroup channels) {
+    private final AtomicInteger globalReqNums;
+
+    public ServerHandler(ProviderInvokerCore invokerCore, ChannelGroup channels, AtomicInteger globalReqNums) {
         this.invokerCore = invokerCore;
         this.channels = channels;
         this.reqIds = new HashSet<>();
         this.msgTimeout = System.currentTimeMillis();
+        this.globalReqNums = globalReqNums;
     }
 
     @Override
@@ -52,8 +56,9 @@ public class ServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
                     if (messagePreHandleFilter(channel, msg)) {
                         collectMessageData(channel, msg);
                         RpcResponse response = invokerCore.requestComingBellRing(msg);
-                        reqIds.remove(msg.getRequestId());
                         channel.writeAndFlush(response);
+                        reqIds.remove(msg.getRequestId());
+                        globalReqNums.decrementAndGet();
                     }
                 }
             } catch (Exception e) {
@@ -87,6 +92,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
     private void collectMessageData(Channel channel, RpcRequest msg) {
         channelClosing = false;
         channels.add(channel);
+        globalReqNums.getAndIncrement();
         long reqTimeout = msg.getTimeout() + msg.getCreateTimeMillis();
         if (msgTimeout < reqTimeout) {
             msgTimeout = reqTimeout;
@@ -117,10 +123,19 @@ public class ServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
                 channel.writeAndFlush(HeartBeat.channelCloseRespFailed());
             }
             return false;
-        } else if (channelClosing) {
+        } else if (channelClosing || !ServerHandler.SERVER_STATUS) {
             channel.writeAndFlush(RpcResponse.builder().code(-1).exception(new ServerClosingException()).build());
             return false;
         }
         return true;
     }
+
+    public static void serverHandlerClose() {
+        SERVER_STATUS = false;
+    }
+
+    public static void serverHandlerOpen() {
+        SERVER_STATUS = true;
+    }
+
 }

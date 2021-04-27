@@ -74,7 +74,7 @@ public class ClientHandler extends SimpleChannelInboundHandler<RpcResponse> {
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
             String serverAddr = ctx.channel().remoteAddress().toString().substring(1);
-            if (idleHeartBeatTimes.getAndIncrement() < 5) {
+            if (idleHeartBeatTimes.getAndIncrement() < 10) {
                 log.debug("[daiwei-rpc] send heart beat request");
                 ctx.channel().writeAndFlush(HeartBeat.healthReq());
             } else {
