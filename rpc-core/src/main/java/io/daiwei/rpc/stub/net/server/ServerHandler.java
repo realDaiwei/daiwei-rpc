@@ -54,6 +54,7 @@ public class ServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
                 if (invokerCore.valid(msg)) {
                     Channel channel = ctx.channel();
                     if (messagePreHandleFilter(channel, msg)) {
+                        globalReqNums.getAndIncrement();
                         collectMessageData(channel, msg);
                         RpcResponse response = invokerCore.requestComingBellRing(msg);
                         channel.writeAndFlush(response);
@@ -90,14 +91,13 @@ public class ServerHandler extends SimpleChannelInboundHandler<RpcRequest> {
      * @param msg
      */
     private void collectMessageData(Channel channel, RpcRequest msg) {
+        reqIds.add(msg.getRequestId());
         channelClosing = false;
         channels.add(channel);
-        globalReqNums.getAndIncrement();
         long reqTimeout = msg.getTimeout() + msg.getCreateTimeMillis();
         if (msgTimeout < reqTimeout) {
             msgTimeout = reqTimeout;
         }
-        reqIds.add(msg.getRequestId());
     }
 
     /**

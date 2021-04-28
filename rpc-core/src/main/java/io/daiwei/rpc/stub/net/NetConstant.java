@@ -4,6 +4,7 @@ import io.daiwei.rpc.exception.ServerClosingException;
 import org.omg.CORBA.PUBLIC_MEMBER;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,4 +30,6 @@ public class NetConstant {
     public static final String FILE_SEPARATOR = "/";
 
     public static final List<Class<?>> RPC_NEED_RETRY_EXS = Collections.singletonList(ServerClosingException.class);
+
+    public static final BigDecimal SUB_HEALTH_AVAILABLE_RATE = new BigDecimal("0.8");
 }

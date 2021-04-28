@@ -26,12 +26,12 @@ public class RpcRefBean {
 
     private String accessToken;
 
-    private long timeout = 60 * 1000;
+    private long timeout;
 
     private String version;
 
     private List<Class<?>> retryExceptions;
 
-    private Integer retryTimes = 3;
+    private Integer retryTimes;
 
 }

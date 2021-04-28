@@ -69,6 +69,9 @@ public class DelegateInvokerMethod {
                     if (retryTimes > 0) {
                         log.debug("[daiwei-rpc] rpc auto failover failed invoke");
                     }
+                    if (retryTimes < this.retryTimes) {
+                        invokerUnit.getClientCore().invokeSuccess(url);
+                    }
                     break;
                 }
                 cleanAfterInvokeFailed(requestId, url, healthUrls);
@@ -92,7 +95,7 @@ public class DelegateInvokerMethod {
 
     private void cleanAfterInvokeFailed(String requestId, String url, List<String> healthUrls) {
         invokerUnit.getClientCore().removeTimeoutRespFromPool(requestId);
-        invokerUnit.getClientCore().addUrlToSubHealth(url);
+        invokerUnit.getClientCore().invokeFailed(url);
         healthUrls.remove(url);
     }
 }

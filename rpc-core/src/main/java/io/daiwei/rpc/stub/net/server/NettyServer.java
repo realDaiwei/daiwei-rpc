@@ -86,6 +86,7 @@ public class NettyServer {
 
     /**
      * 关闭 netty Server
+     * 如果当前server 中存在正在处理的请求，延迟 10 关闭
      */
     public void close() {
         ServerHandler.serverHandlerClose();

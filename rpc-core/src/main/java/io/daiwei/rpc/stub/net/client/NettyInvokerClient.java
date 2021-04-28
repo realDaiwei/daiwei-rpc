@@ -15,6 +15,7 @@ public class NettyInvokerClient extends ClientInvokerCore {
 
     @Override
     public Client getClient(String addr) {
+        System.out.println(this.clientServers.size());
         initClientServerIfAbsent(addr);
         return new NettyClient(this.clientServers.get(addr), respPool);
     }
@@ -29,7 +30,7 @@ public class NettyInvokerClient extends ClientInvokerCore {
                 return;
             }
             NettyClientServer clientServer = new NettyClientServer(this.serializer);
-            clientServer.init(addr, new ClientHandler(respPool, this.subHealthList, this.clientServers));
+            clientServer.init(addr, new ClientHandler(respPool, this.clientServers, this.availableAnalyzer));
             this.clientServers.put(addr, clientServer);
         }
     }

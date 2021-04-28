@@ -11,9 +11,9 @@ import java.util.concurrent.*;
  */
 public class ThreadPoolUtil {
 
-    private static final int CORE_SIZE = 4;
+    private static final int CORE_SIZE = 20;
 
-    private static final int MAX_SIZE = Runtime.getRuntime().availableProcessors();
+    private static final int MAX_SIZE = 40;
 
     private static final long KEEP_ALIVE_TIME = 60;
 
