@@ -15,7 +15,6 @@ public class NettyInvokerClient extends ClientInvokerCore {
 
     @Override
     public Client getClient(String addr) {
-        System.out.println(this.clientServers.size());
         initClientServerIfAbsent(addr);
         return new NettyClient(this.clientServers.get(addr), respPool);
     }
