@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  */
 public final class HeartBeat {
 
-    public static final int BEAT_INTERVAL = 10;
+    public static final int BEAT_INTERVAL = 30;
 
     public static RpcRequest healthReq() {
         return RpcRequest.builder().requestId(NetConstant.HEART_BEAT_REQ_ID).createTimeMillis(System.currentTimeMillis())
