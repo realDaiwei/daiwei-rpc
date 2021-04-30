@@ -3,6 +3,7 @@ package io.daiwei.rpc.register.zk;
 import io.daiwei.rpc.register.RegisterConstant;
 import io.daiwei.rpc.register.RpcRegister;
 import io.daiwei.rpc.stub.net.NetConstant;
+import lombok.Data;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -13,7 +14,9 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -44,10 +47,6 @@ public abstract class ZkRpcRegister implements RpcRegister {
         }
     }
 
-    @Override
-    public List<String> pullAvailableUrls(Class<?> clazz) {
-        return new ArrayList<>();
-    }
 
     @Override
     public void registerInvokeProxy(Class<?> clazz) throws Exception {}

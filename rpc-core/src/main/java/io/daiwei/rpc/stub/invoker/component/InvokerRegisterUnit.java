@@ -5,16 +5,10 @@ import io.daiwei.rpc.register.RegisterConstant;
 import io.daiwei.rpc.register.zk.ZkRpcRegister;
 import io.daiwei.rpc.stub.common.ConnectionManager;
 import io.daiwei.rpc.stub.net.NetConstant;
-import io.daiwei.rpc.stub.net.client.NettyClientServer;
-import io.daiwei.rpc.stub.net.common.ConnectServer;
-import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.cache.CuratorCacheListener;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
-import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
-import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.data.Stat;
 
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -71,6 +65,7 @@ public class InvokerRegisterUnit extends ZkRpcRegister {
             if (!Arrays.asList(PathChildrenCacheEvent.Type.CHILD_REMOVED, PathChildrenCacheEvent.Type.CHILD_ADDED).contains(event.getType())) {
                 return;
             }
+            String ts = new String(event.getData().getData(), StandardCharsets.UTF_8);
             String[] str = event.getData().getPath().split(NetConstant.FILE_SEPARATOR);
             if (RegisterConstant.RPC_SERVICE.equals(new String(event.getData().getData(), StandardCharsets.UTF_8))) {
                 if (!availPathMap.containsKey(str[1])) {
@@ -90,4 +85,5 @@ public class InvokerRegisterUnit extends ZkRpcRegister {
         }).build();
         registerListeners(Collections.singletonList(listener));
     }
+
 }

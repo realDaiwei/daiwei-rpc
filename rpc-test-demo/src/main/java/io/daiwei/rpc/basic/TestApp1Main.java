@@ -12,7 +12,7 @@ public class TestApp1Main {
     public static void main(String[] args) throws InterruptedException {
         RpcInvokerFactory factory = new RpcInvokerFactory("127.0.0.1:2181");
         UserService userService = factory.createStubByClass(UserService.class);
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 100; i++) {
             User user = userService.findByUser(10L);
             System.out.println(user);
         }

@@ -21,7 +21,9 @@ import sun.nio.ch.Net;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by Daiwei on 2021/4/14
@@ -63,7 +65,7 @@ public class ProviderRegisterUnit extends ZkRpcRegister {
                 client.create().withMode(CreateMode.PERSISTENT).forPath(NetConstant.FILE_SEPARATOR + service.getCanonicalName(), RegisterConstant.RPC_SERVICE.getBytes(StandardCharsets.UTF_8));
             }
             String addr = NetUtil.getIpAddress().concat(":").concat(String.valueOf(port));
-            client.create().withMode(CreateMode.EPHEMERAL).forPath(NetConstant.FILE_SEPARATOR + service.getCanonicalName() + NetConstant.FILE_SEPARATOR + addr, RegisterConstant.RPC_PROVIDER.getBytes(StandardCharsets.UTF_8));
+            client.create().withMode(CreateMode.EPHEMERAL).forPath(NetConstant.FILE_SEPARATOR + service.getCanonicalName() + NetConstant.FILE_SEPARATOR + addr, String.valueOf(System.currentTimeMillis()).getBytes(StandardCharsets.UTF_8));
         } catch (Exception exception) {
             log.error("create zk node failed.", exception);
             exception.printStackTrace();
