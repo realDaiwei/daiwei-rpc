@@ -49,7 +49,6 @@ public class WeightRandomLoadBalance extends LoadBalance {
             long interval =  (System.currentTimeMillis() - value) / 1000;
             int loadFactor = FULL_LOAD_FACTOR;
             if (interval < FULL_LOAD_FACTOR) {
-                System.out.println(interval);
                 loadFactor = (int) interval;
             }
             loadFactorMap.put(s, loadFactor);
