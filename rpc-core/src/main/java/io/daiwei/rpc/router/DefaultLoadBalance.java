@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by Daiwei on 2021/4/18
  */
-public class DefaultLoadBalance implements LoadBalance {
+public class DefaultLoadBalance extends LoadBalance {
 
     private final AtomicInteger cnt = new AtomicInteger();
 
@@ -22,4 +22,5 @@ public class DefaultLoadBalance implements LoadBalance {
             throw new DaiweiRpcException("no available server url");
         }
     }
+
 }

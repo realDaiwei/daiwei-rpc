@@ -22,11 +22,14 @@ public class InvokerRegisterUnit extends ZkRpcRegister {
 
     private final Map<String, List<String>> availPathMap;
 
+    private final Map<String, String> zkData;
+
     protected final ConnectionManager connectionManager;
 
     public InvokerRegisterUnit(String zkConnStr, ConnectionManager connectionManager) {
         this.zkConnStr = zkConnStr;
         this.availPathMap = new ConcurrentHashMap<>();
+        this.zkData = new ConcurrentHashMap<>();
         this.connectionManager = connectionManager;
     }
 
@@ -65,9 +68,9 @@ public class InvokerRegisterUnit extends ZkRpcRegister {
             if (!Arrays.asList(PathChildrenCacheEvent.Type.CHILD_REMOVED, PathChildrenCacheEvent.Type.CHILD_ADDED).contains(event.getType())) {
                 return;
             }
-            String ts = new String(event.getData().getData(), StandardCharsets.UTF_8);
             String[] str = event.getData().getPath().split(NetConstant.FILE_SEPARATOR);
-            if (RegisterConstant.RPC_SERVICE.equals(new String(event.getData().getData(), StandardCharsets.UTF_8))) {
+            String data = new String(event.getData().getData(), StandardCharsets.UTF_8);
+            if (RegisterConstant.RPC_SERVICE.equals(data)) {
                 if (!availPathMap.containsKey(str[1])) {
                     availPathMap.put(str[1], new CopyOnWriteArrayList<>());
                 }
@@ -76,7 +79,9 @@ public class InvokerRegisterUnit extends ZkRpcRegister {
             if (event.getType() == PathChildrenCacheEvent.Type.CHILD_REMOVED) {
                 availPathMap.get(str[1]).remove(str[2]);
                 this.connectionManager.removeConn(str[2]);
+                zkData.remove(str[2]);
             } else if (event.getType() == PathChildrenCacheEvent.Type.CHILD_ADDED) {
+                zkData.put(str[2], data);
                 List<String> urls = availPathMap.get(str[1]);
                 if (!urls.contains(str[2])) {
                     urls.add(str[2]);
@@ -84,6 +89,10 @@ public class InvokerRegisterUnit extends ZkRpcRegister {
             }
         }).build();
         registerListeners(Collections.singletonList(listener));
+    }
+
+    public Map<String, String> getZkData() {
+        return this.zkData;
     }
 
 }

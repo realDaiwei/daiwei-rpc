@@ -1,6 +1,7 @@
 package io.daiwei.rpc.stub.invoker.factory;
 
 import io.daiwei.rpc.router.DefaultLoadBalance;
+import io.daiwei.rpc.router.WeightRandomLoadBalance;
 import io.daiwei.rpc.router.common.LoadBalance;
 import io.daiwei.rpc.serializer.impl.HessianSerializer;
 import io.daiwei.rpc.stub.invoker.component.InvokerUnit;
@@ -72,7 +73,8 @@ public class RpcInvokerFactory {
             this.invokerUnit.afterSetProperties();
             this.registerUnit = new InvokerRegisterUnit(zkConnStr, this.invokerUnit.getClientCore());
             this.registerUnit.afterSetProperties();
-            this.loadBalance = new DefaultLoadBalance();
+            this.loadBalance = new WeightRandomLoadBalance();
+            this.loadBalance.setDataMap(registerUnit.getZkData());
         } catch (Exception exception) {
             exception.printStackTrace();
         }

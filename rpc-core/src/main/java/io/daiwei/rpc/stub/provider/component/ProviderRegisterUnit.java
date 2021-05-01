@@ -90,7 +90,6 @@ public class ProviderRegisterUnit extends ZkRpcRegister {
         registerListeners(Collections.singletonList(listener));
     }
 
-
     private void serverCheck(Class<?> clazz) {
         Class<?>[] interfaces = clazz.getInterfaces();
         if (interfaces.length == 0) {
