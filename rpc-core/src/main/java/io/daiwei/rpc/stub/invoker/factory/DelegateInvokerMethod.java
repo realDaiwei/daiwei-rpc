@@ -42,7 +42,7 @@ public class DelegateInvokerMethod {
         this.urls = refBean.getAvailUrls();
         this.timeout = refBean.getTimeout();
         this.retryTimes = refBean.getRetryTimes();
-        this.retryException = refBean.getRetryExceptions() == null ? new ArrayList<>() : refBean.getRetryExceptions();
+        this.retryException = refBean.getRetryExceptions();
         this.retryException.addAll(NetConstant.RPC_NEED_RETRY_EXS);
     }
 

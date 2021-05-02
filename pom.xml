@@ -9,16 +9,15 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>rpc-core</module>
-        <module>rpc-test-demo</module>
+        <module>rpc-test</module>
+        <module>rpc-spring</module>
+        <module>rpc-springboot-starter</module>
     </modules>
     <packaging>pom</packaging>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <guava.version>21.0</guava.version>
-        <springboot.version>2.4.3</springboot.version>
-        <spring.version>5.2.2.RELEASE</spring.version>
         <lombok.version>1.18.18</lombok.version>
         <log.version>1.7.30</log.version>
         <log.core.version>2.12.1</log.core.version>
@@ -30,6 +29,9 @@
         <hessian.version>4.0.63</hessian.version>
         <zk.curator.version>5.1.0</zk.curator.version>
         <oshi.version>3.4.0</oshi.version>
+        <spring.version>5.3.5</spring.version>
+        <springboot.version>2.4.3</springboot.version>
+        <reflection.version>0.9.11</reflection.version>
     </properties>
 
     <dependencyManagement>
@@ -39,11 +41,7 @@
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
             </dependency>
-            <dependency>
-                <groupId>cglib</groupId>
-                <artifactId>cglib</artifactId>
-                <version>${cglib.version}</version>
-            </dependency>
+
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
@@ -59,36 +57,19 @@
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>${log.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
                 <version>${springboot.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter</artifactId>
-                <version>${springboot.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-test</artifactId>
-                <version>${springboot.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-web</artifactId>
-                <version>${springboot.version}</version>
-            </dependency>
+
             <dependency>
                 <groupId>org.reflections</groupId>
                 <artifactId>reflections</artifactId>
                 <version>${reflect.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.google.guava</groupId>
-                <artifactId>guava</artifactId>
-                <version>${guava.version}</version>
-            </dependency>
+
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
@@ -129,6 +110,19 @@
                 <artifactId>oshi-core</artifactId>
                 <version>${oshi.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>${spring.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>${reflection.version}</version>
+            </dependency>
+
 
         </dependencies>
     </dependencyManagement>

@@ -1,6 +1,5 @@
 package io.daiwei.rpc.stub.invoker.factory;
 
-import io.daiwei.rpc.router.DefaultLoadBalance;
 import io.daiwei.rpc.router.WeightRandomLoadBalance;
 import io.daiwei.rpc.router.common.LoadBalance;
 import io.daiwei.rpc.serializer.impl.HessianSerializer;
@@ -14,7 +13,6 @@ import net.bytebuddy.implementation.MethodDelegation;
 import net.bytebuddy.matcher.ElementMatchers;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
@@ -39,7 +37,7 @@ public class RpcInvokerFactory {
      * @param rpcRefBean
      * @return
      */
-    public Object createStub(RpcRefBean rpcRefBean) {
+    private Object createStub(RpcRefBean rpcRefBean) {
         Object stub = null;
         try {
             stub = new ByteBuddy().subclass(rpcRefBean.getTargetFace()).method(ElementMatchers.any())
@@ -58,13 +56,20 @@ public class RpcInvokerFactory {
      * @return
      */
     public <T> T createStubByClass(Class<T> clazz) {
-        List<String> strings = registerUnit.pullAvailableUrls(clazz);
+        List<String> strings = registerUnit.findAvailableUrls(clazz);
         List<Class<?>> retryException = new ArrayList<>();
         retryException.add(TimeoutException.class);
         RpcRefBean refBean = RpcRefBean.builder().targetFace(clazz).availUrls(strings).version("1.0").retryTimes(2)
                 .accessToken("").timeout(60000).retryExceptions(retryException).build();
         Object stub = createStub(refBean);
         return clazz.cast(stub);
+    }
+
+    public Object createStubByRefBean(RpcRefBean refBean) {
+        List<String> availableUrls = registerUnit.findAvailableUrls(refBean.getTargetFace());
+        refBean.setAvailUrls(availableUrls);
+        refBean.setRetryExceptions(new ArrayList<>(refBean.getRetryExceptions()));
+        return createStub(refBean);
     }
 
     public void start(String zkConnStr) {
@@ -80,7 +85,7 @@ public class RpcInvokerFactory {
         }
     }
 
-    private void stop() {
+    public void stop() {
         try {
             invokerUnit.stop();
             registerUnit.stop();
@@ -88,9 +93,5 @@ public class RpcInvokerFactory {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private List<String> route(List<String> urls) {
-        return urls;
     }
 }

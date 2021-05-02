@@ -40,7 +40,7 @@ public class InvokerRegisterUnit extends ZkRpcRegister {
     }
 
     @Override
-    public List<String> pullAvailableUrls(Class<?> clazz) {
+    public List<String> findAvailableUrls(Class<?> clazz) {
         String clazzName = clazz.getCanonicalName();
         if (availPathMap.containsKey(clazzName)) {
             return availPathMap.get(clazzName);

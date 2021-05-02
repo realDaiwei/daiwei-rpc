@@ -67,7 +67,7 @@ public abstract class ZkRpcRegister implements RpcRegister {
     public void registerListeners() {}
 
     @Override
-    public List<String> pullAvailableUrls(Class<?> clazz) {
+    public List<String> findAvailableUrls(Class<?> clazz) {
         return null;
     }
 }

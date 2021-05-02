@@ -106,7 +106,7 @@ public class NettyServer {
         if (workerGroup != null) {
             this.workerGroup.shutdownGracefully();
         }
-        log.debug("[daiwei-rpc] netty server of rpc is offline");
+        log.info("[daiwei-rpc] netty server of rpc is offline");
     }
 
     public boolean isValid() {

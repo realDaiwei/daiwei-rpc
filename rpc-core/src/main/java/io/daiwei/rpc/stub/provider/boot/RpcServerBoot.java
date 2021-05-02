@@ -50,7 +50,7 @@ public class RpcServerBoot {
         return new ServerBuilder();
     }
 
-    private void stop() {
+    public void stop() {
         this.registerUnit.stop();
         this.serverStubUnit.stop();
     }

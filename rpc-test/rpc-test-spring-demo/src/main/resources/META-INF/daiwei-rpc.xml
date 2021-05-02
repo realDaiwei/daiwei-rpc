@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:rpc="https://spring.daiwei.io/schema/rpc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        https://spring.daiwei.io/schema/rpc
+        https://spring.daiwei.io/schema/rpc.xsd ">
+
+<!--    <rpc:provider id="provider" register-conn="127.0.0.1:2181"-->
+<!--                  service-package-path="io.daiwei.rpc.service.impl"/>-->
+
+    <rpc:consumer id="consumer" register-conn="127.0.0.1:2181"/>
+
+    <bean class="io.daiwei.rpc.service.UserActionService"/>
+
+</beans>

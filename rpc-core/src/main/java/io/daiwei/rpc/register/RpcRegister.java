@@ -15,7 +15,7 @@ public interface RpcRegister {
 
     void stop();
 
-    List<String> pullAvailableUrls(Class<?> clazz);
+    List<String> findAvailableUrls(Class<?> clazz);
 
     void registerInvokeProxy(Class<?> clazz) throws Exception;
 
