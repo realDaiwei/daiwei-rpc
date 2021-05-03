@@ -6,7 +6,7 @@
 
     <groupId>io.daiwei</groupId>
     <artifactId>daiwei-rpc</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-beta</version>
     <modules>
         <module>rpc-core</module>
         <module>rpc-test</module>
@@ -31,7 +31,6 @@
         <oshi.version>3.4.0</oshi.version>
         <spring.version>5.3.5</spring.version>
         <springboot.version>2.4.3</springboot.version>
-        <reflection.version>0.9.11</reflection.version>
     </properties>
 
     <dependencyManagement>
@@ -116,13 +115,6 @@
                 <artifactId>spring-context</artifactId>
                 <version>${spring.version}</version>
             </dependency>
-
-            <dependency>
-                <groupId>org.reflections</groupId>
-                <artifactId>reflections</artifactId>
-                <version>${reflection.version}</version>
-            </dependency>
-
 
         </dependencies>
     </dependencyManagement>
