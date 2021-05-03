@@ -21,7 +21,7 @@ public class RpcServerBoot {
 
     private final int availablePort;
 
-    private final List<Class<?>> clazzList;
+    private final List<RegisterService> clazzList;
 
     private RpcServerBoot(int port, String zkConnStr) {
         this.availablePort = port;
@@ -58,9 +58,9 @@ public class RpcServerBoot {
     private void start() {
         serverStubUnit.afterSetProperties();
         try {
-            for (Class<?> clazz : clazzList) {
-                registerUnit.registerInvokeProxy(clazz);
-                registerUnit.registerService(this.availablePort, clazz);
+            for (RegisterService service : clazzList) {
+                registerUnit.registerInvokeProxy(service.getClazz());
+                registerUnit.registerService(this.availablePort, service.getClazz(), service.getVersion());
             }
         } catch (InstantiationException | IllegalAccessException e) {
             e.printStackTrace();
@@ -90,13 +90,33 @@ public class RpcServerBoot {
             return this;
         }
 
-        public ServerBuilder registerService(Class<?> clazz) {
-            this.rpcServerBoot.clazzList.add(clazz);
+        public ServerBuilder registerService(Class<?> clazz, String version) {
+            this.rpcServerBoot.clazzList.add(new RegisterService(clazz, version));
             return this;
         }
 
         public RpcServerBoot build() {
             return this.rpcServerBoot;
+        }
+    }
+
+    private static class RegisterService {
+
+        private final Class<?> clazz;
+
+        private final String version;
+
+        public RegisterService(Class<?> clazz, String version) {
+            this.clazz = clazz;
+            this.version = version;
+        }
+
+        public Class<?> getClazz() {
+            return clazz;
+        }
+
+        public String getVersion() {
+            return version;
         }
     }
 }

@@ -32,6 +32,8 @@ public class RpcRefBean {
 
     private List<Class<?>> retryExceptions;
 
+    private Class<?> routerClass;
+
     private Integer retryTimes;
 
 }

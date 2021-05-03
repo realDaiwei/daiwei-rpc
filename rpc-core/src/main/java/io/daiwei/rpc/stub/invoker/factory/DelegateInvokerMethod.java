@@ -1,6 +1,9 @@
 package io.daiwei.rpc.stub.invoker.factory;
 
+import io.daiwei.rpc.router.common.Filter;
 import io.daiwei.rpc.router.common.LoadBalance;
+import io.daiwei.rpc.router.common.Router;
+import io.daiwei.rpc.spi.RpcSpiPluginLoader;
 import io.daiwei.rpc.stub.invoker.component.InvokerUnit;
 import io.daiwei.rpc.stub.invoker.refbean.RpcRefBean;
 import io.daiwei.rpc.stub.net.Client;
@@ -28,7 +31,9 @@ public class DelegateInvokerMethod {
 
     private final LoadBalance loadBalance;
 
-    private final List<String> urls;
+    private final Class<?> routerClass;
+
+    private List<String> urls;
 
     private final long timeout;
 
@@ -39,6 +44,7 @@ public class DelegateInvokerMethod {
     public DelegateInvokerMethod(RpcRefBean refBean, LoadBalance loadBalance, InvokerUnit invokerUnit) {
         this.invokerUnit = invokerUnit;
         this.loadBalance = loadBalance;
+        this.routerClass = refBean.getRouterClass();
         this.urls = refBean.getAvailUrls();
         this.timeout = refBean.getTimeout();
         this.retryTimes = refBean.getRetryTimes();
@@ -51,6 +57,7 @@ public class DelegateInvokerMethod {
         Class<?> iface = target.getClass().getInterfaces()[0];
         RpcRequest request = RpcRequest.builder().methodName(method.getName()).classType(iface)
                 .params(args).className(iface.getCanonicalName()).timeout(this.timeout).build();
+        this.urls = filterAndRoute(this.urls, routerClass, method, args);
         List<String> healthUrls = invokerUnit.filterSubHealth(this.urls);
         RpcResponse rpcResponse = null;
         Client client = null;
@@ -97,5 +104,26 @@ public class DelegateInvokerMethod {
         invokerUnit.getClientCore().removeTimeoutRespFromPool(requestId);
         invokerUnit.getClientCore().invokeFailed(url);
         healthUrls.remove(url);
+    }
+
+    private List<String> filterAndRoute(List<String> urls, Class<?> clazz, Method method, Object[] args) {
+        List<Filter> filterList = RpcSpiPluginLoader.getFilterList();
+        List<String> res = new ArrayList<>();
+        if (!filterList.isEmpty()) {
+            for (Filter filter : filterList) {
+                for (String url : urls) {
+                    if (filter.filter(url, method, args)) {
+                        res.add(url);
+                    }
+                }
+            }
+        } else {
+            res = urls;
+        }
+        Router router = RpcSpiPluginLoader.getRouterByClass(clazz);
+        if (router != null) {
+            res = router.route(res, method, args);
+        }
+        return res;
     }
 }

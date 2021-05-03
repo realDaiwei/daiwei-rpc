@@ -9,7 +9,7 @@ import io.daiwei.rpc.stub.provider.boot.RpcServerBoot;
 public class ServerTest3Main {
 
     public static void main(String[] args) {
-        RpcServerBoot.builder().init("127.0.0.1:2181").registerService(UserServiceImpl.class)
+        RpcServerBoot.builder().init("127.0.0.1:2181").registerService(UserServiceImpl.class, null)
                 .build().run();
     }
 }

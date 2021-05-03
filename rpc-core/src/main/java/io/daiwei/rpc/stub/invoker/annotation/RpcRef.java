@@ -19,6 +19,8 @@ public @interface RpcRef {
 
     Class<?>[] retryExceptions() default {};
 
-    double version() default 1.0;
+    Class<?> routerClass() default Void.class;
+
+    String version() default "";
 
 }

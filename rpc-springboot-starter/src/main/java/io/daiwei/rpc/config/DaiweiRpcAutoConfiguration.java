@@ -44,8 +44,4 @@ public class DaiweiRpcAutoConfiguration {
         return bean;
     }
 
-    @Bean
-    public String hello() {
-        return "daiwei!";
-    }
 }

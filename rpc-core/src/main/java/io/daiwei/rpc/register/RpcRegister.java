@@ -15,11 +15,11 @@ public interface RpcRegister {
 
     void stop();
 
-    List<String> findAvailableUrls(Class<?> clazz);
+    List<String> findAvailableUrls(Class<?> clazz, String version);
 
     void registerInvokeProxy(Class<?> clazz) throws Exception;
 
-    void registerService(int port, Class<?> clazz) throws Exception;
+    void registerService(int port, Class<?> clazz, String version) throws Exception;
 
     void registerListeners(List<CuratorCacheListener> listeners);
 

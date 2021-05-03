@@ -19,7 +19,7 @@ public class TestAppMain {
 //        UserService stub = (UserService) factory.createStub(rpcRefBean);
 //        long start = System.currentTimeMillis();
         RpcInvokerFactory factory = new RpcInvokerFactory("127.0.0.1:2181");
-        UserService userService = factory.createStubByClass(UserService.class);
+        UserService userService = factory.createStubByClass(UserService.class, null);
 //        for (int i = 0; i < 100000; i++) {
 //            User user = userService.findByUser(10L);
 //            System.out.println(user);
@@ -27,9 +27,9 @@ public class TestAppMain {
 //        }
 
         System.out.println(userService.findByUser(10L));
-        OrderService orderService = factory.createStubByClass(OrderService.class);
-        Order order = orderService.findById(10L);
-        System.out.println(order);
+//        OrderService orderService = factory.createStubByClass(OrderService.class);
+//        Order order = orderService.findById(10L);
+//        System.out.println(order);
 //        for (int i = 0; i < 10; i++) {
 //            System.out.println(user);
 //        }

@@ -2,6 +2,7 @@ package io.daiwei.rpc.controller;
 
 import io.daiwei.rpc.entity.ReturnT;
 import io.daiwei.rpc.entity.User;
+import io.daiwei.rpc.router.DefaultRouter;
 import io.daiwei.rpc.service.UserService;
 import io.daiwei.rpc.stub.invoker.annotation.RpcRef;
 import io.daiwei.rpc.stub.provider.annotation.RpcService;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/rpc")
 public class RpcTestController {
 
-    @RpcRef
+    @RpcRef(routerClass = DefaultRouter.class, version = "1.0")
     private UserService userService;
 
     @GetMapping("/user")

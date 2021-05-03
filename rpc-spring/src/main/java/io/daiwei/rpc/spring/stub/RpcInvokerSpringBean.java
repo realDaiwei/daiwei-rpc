@@ -30,8 +30,8 @@ public class RpcInvokerSpringBean implements BeanPostProcessor, InitializingBean
             if (field.isAnnotationPresent(RpcRef.class)) {
                 RpcRef rpcRef = field.getAnnotation(RpcRef.class);
                 RpcRefBean refBean = RpcRefBean.builder().retryTimes(rpcRef.retryTimes()).timeout(rpcRef.timeout())
-                        .retryExceptions(Arrays.asList(rpcRef.retryExceptions()))
-                        .targetFace(field.getType()).build();
+                        .retryExceptions(Arrays.asList(rpcRef.retryExceptions())).routerClass(rpcRef.routerClass())
+                        .targetFace(field.getType()).version(rpcRef.version().isEmpty() ? null : rpcRef.version()).build();
                 field.setAccessible(true);
                 field.set(bean, rpcInvokerFactory.createStubByRefBean(refBean));
             }

@@ -2,6 +2,7 @@ package io.daiwei.rpc.spring.stub;
 
 import io.daiwei.rpc.stub.provider.annotation.RpcService;
 import io.daiwei.rpc.stub.provider.boot.RpcServerBoot;
+import io.daiwei.rpc.stub.provider.common.ServerInitRunnable;
 import org.reflections.Reflections;
 import org.reflections.util.ConfigurationBuilder;
 import org.springframework.beans.factory.DisposableBean;
@@ -26,7 +27,11 @@ public class RpcSpringServerBoot implements InitializingBean, DisposableBean {
     public void afterPropertiesSet() {
         RpcServerBoot.ServerBuilder builder = RpcServerBoot.builder().init(this.registerConn);
         for (Class<?> registerClazz : scanRpcAnnotatedClass(this.scanPackagePath)) {
-            builder.registerService(registerClazz);
+            RpcService rpcService = registerClazz.getAnnotation(RpcService.class);
+            for (Class<? extends ServerInitRunnable> clazz : rpcService.init()) {
+                runInit(clazz);
+            }
+            builder.registerService(registerClazz, rpcService.version().isEmpty() ? null : rpcService.version());
         }
         this.rpcServerBoot = builder.build();
         this.rpcServerBoot.runAsync();
@@ -51,4 +56,12 @@ public class RpcSpringServerBoot implements InitializingBean, DisposableBean {
         this.scanPackagePath = scanPackagePath;
     }
 
+
+    private void runInit(Class<? extends ServerInitRunnable> clazz) {
+        try {
+            clazz.newInstance().init();
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
 }

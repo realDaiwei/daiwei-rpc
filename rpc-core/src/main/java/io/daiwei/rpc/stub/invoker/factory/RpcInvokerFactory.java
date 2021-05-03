@@ -1,8 +1,11 @@
 package io.daiwei.rpc.stub.invoker.factory;
 
 import io.daiwei.rpc.router.WeightRandomLoadBalance;
+import io.daiwei.rpc.router.common.Filter;
 import io.daiwei.rpc.router.common.LoadBalance;
+import io.daiwei.rpc.router.common.Router;
 import io.daiwei.rpc.serializer.impl.HessianSerializer;
+import io.daiwei.rpc.spi.RpcSpiPluginLoader;
 import io.daiwei.rpc.stub.invoker.component.InvokerUnit;
 import io.daiwei.rpc.stub.invoker.component.InvokerRegisterUnit;
 import io.daiwei.rpc.stub.invoker.refbean.RpcRefBean;
@@ -14,6 +17,7 @@ import net.bytebuddy.matcher.ElementMatchers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -27,8 +31,8 @@ public class RpcInvokerFactory {
 
     private LoadBalance loadBalance;
 
-    public RpcInvokerFactory(String zkConnStr) {
-        start(zkConnStr);
+    public RpcInvokerFactory(String registerConn) {
+        start(registerConn);
         Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
     }
 
@@ -55,8 +59,8 @@ public class RpcInvokerFactory {
      * @param <T>
      * @return
      */
-    public <T> T createStubByClass(Class<T> clazz) {
-        List<String> strings = registerUnit.findAvailableUrls(clazz);
+    public <T> T createStubByClass(Class<T> clazz, String version) {
+        List<String> strings = registerUnit.findAvailableUrls(clazz, version);
         List<Class<?>> retryException = new ArrayList<>();
         retryException.add(TimeoutException.class);
         RpcRefBean refBean = RpcRefBean.builder().targetFace(clazz).availUrls(strings).version("1.0").retryTimes(2)
@@ -66,7 +70,7 @@ public class RpcInvokerFactory {
     }
 
     public Object createStubByRefBean(RpcRefBean refBean) {
-        List<String> availableUrls = registerUnit.findAvailableUrls(refBean.getTargetFace());
+        List<String> availableUrls = registerUnit.findAvailableUrls(refBean.getTargetFace(), refBean.getVersion());
         refBean.setAvailUrls(availableUrls);
         refBean.setRetryExceptions(new ArrayList<>(refBean.getRetryExceptions()));
         return createStub(refBean);
@@ -78,6 +82,7 @@ public class RpcInvokerFactory {
             this.invokerUnit.afterSetProperties();
             this.registerUnit = new InvokerRegisterUnit(zkConnStr, this.invokerUnit.getClientCore());
             this.registerUnit.afterSetProperties();
+            RpcSpiPluginLoader.load();
             this.loadBalance = new WeightRandomLoadBalance();
             this.loadBalance.setDataMap(registerUnit.getZkData());
         } catch (Exception exception) {
@@ -94,4 +99,5 @@ public class RpcInvokerFactory {
             e.printStackTrace();
         }
     }
+
 }

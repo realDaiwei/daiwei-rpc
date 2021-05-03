@@ -57,15 +57,19 @@ public class ProviderRegisterUnit extends ZkRpcRegister {
     }
 
     @Override
-    public void registerService(int port, Class<?> clazz) {
+    public void registerService(int port, Class<?> clazz, String version) {
         try {
             serverCheck(clazz);
             Class<?> service = clazz.getInterfaces()[0];
-            if (null == client.checkExists().forPath(NetConstant.FILE_SEPARATOR + service.getCanonicalName())) {
-                client.create().withMode(CreateMode.PERSISTENT).forPath(NetConstant.FILE_SEPARATOR + service.getCanonicalName(), RegisterConstant.RPC_SERVICE.getBytes(StandardCharsets.UTF_8));
+            String servicePath = NetConstant.FILE_SEPARATOR + service.getCanonicalName();
+            if (version != null) {
+                servicePath = servicePath.concat("_").concat(version);
+            }
+            if (null == client.checkExists().forPath(servicePath)) {
+                client.create().withMode(CreateMode.PERSISTENT).forPath(servicePath, RegisterConstant.RPC_SERVICE.getBytes(StandardCharsets.UTF_8));
             }
             String addr = NetUtil.getIpAddress().concat(":").concat(String.valueOf(port));
-            client.create().withMode(CreateMode.EPHEMERAL).forPath(NetConstant.FILE_SEPARATOR + service.getCanonicalName() + NetConstant.FILE_SEPARATOR + addr, String.valueOf(System.currentTimeMillis()).getBytes(StandardCharsets.UTF_8));
+            client.create().withMode(CreateMode.EPHEMERAL).forPath(servicePath + File.separator + addr, String.valueOf(System.currentTimeMillis()).getBytes(StandardCharsets.UTF_8));
         } catch (Exception exception) {
             log.error("create zk node failed.", exception);
             exception.printStackTrace();

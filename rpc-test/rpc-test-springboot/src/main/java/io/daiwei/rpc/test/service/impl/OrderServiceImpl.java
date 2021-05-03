@@ -1,6 +1,7 @@
 package io.daiwei.rpc.test.service.impl;
 
 import io.daiwei.rpc.entity.Order;
+import io.daiwei.rpc.rpc.init.HelloInit;
 import io.daiwei.rpc.stub.provider.annotation.RpcService;
 import io.daiwei.rpc.service.OrderService;
 
@@ -9,7 +10,7 @@ import java.util.Date;
 /**
  * Created by Daiwei on 2021/5/2
  */
-@RpcService
+@RpcService(version = "2.0", init = HelloInit.class)
 public class OrderServiceImpl implements OrderService {
 
     @Override
