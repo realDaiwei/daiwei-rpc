@@ -1,0 +1,32 @@
+{
+  "groups": [
+    {
+      "name": "spring.daiwei.rpc.consumer",
+      "type": "io.daiwei.rpc.props.DaiweiRpcConsumerProps",
+      "sourceType": "io.daiwei.rpc.props.DaiweiRpcConsumerProps"
+    },
+    {
+      "name": "spring.daiwei.rpc.provider",
+      "type": "io.daiwei.rpc.props.DaiweiRpcProviderProps",
+      "sourceType": "io.daiwei.rpc.props.DaiweiRpcProviderProps"
+    }
+  ],
+  "properties": [
+    {
+      "name": "spring.daiwei.rpc.consumer.register-conn",
+      "type": "java.lang.String",
+      "sourceType": "io.daiwei.rpc.props.DaiweiRpcConsumerProps"
+    },
+    {
+      "name": "spring.daiwei.rpc.provider.register-conn",
+      "type": "java.lang.String",
+      "sourceType": "io.daiwei.rpc.props.DaiweiRpcProviderProps"
+    },
+    {
+      "name": "spring.daiwei.rpc.provider.scan-package-path",
+      "type": "java.lang.String",
+      "sourceType": "io.daiwei.rpc.props.DaiweiRpcProviderProps"
+    }
+  ],
+  "hints": []
+}

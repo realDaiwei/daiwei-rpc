@@ -1,0 +1,22 @@
+Index: rpc-test/rpc-test-springboot/target/classes/application.yml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>spring:\n  daiwei:\n    rpc:\n      consumer:\n        register-conn: 127.0.0.1:2181\n      provider:\n        register-conn: 127.0.0.1:2181\n<<<<<<< HEAD\n        scan-package-path: io.daiwei.rpc.test.service.impl\nserver:\n  port: 8081\n=======\n        scan-package-path: io.daiwei.rpc.test.service.impl\n>>>>>>> main\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/rpc-test/rpc-test-springboot/target/classes/application.yml b/rpc-test/rpc-test-springboot/target/classes/application.yml
+--- a/rpc-test/rpc-test-springboot/target/classes/application.yml	(revision 471e1f0c5c472a209b8874e583a1d5eb80abd14e)
++++ b/rpc-test/rpc-test-springboot/target/classes/application.yml	(date 1621581559627)
+@@ -5,10 +5,7 @@
+         register-conn: 127.0.0.1:2181
+       provider:
+         register-conn: 127.0.0.1:2181
+-<<<<<<< HEAD
+         scan-package-path: io.daiwei.rpc.test.service.impl
+ server:
+   port: 8081
+-=======
+-        scan-package-path: io.daiwei.rpc.test.service.impl
+->>>>>>> main
++

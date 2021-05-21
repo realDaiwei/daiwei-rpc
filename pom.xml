@@ -9,10 +9,9 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>rpc-core</module>
-        <module>rpc-io.daiwei.rpc.demo-server</module>
-        <module>rpc-io.daiwei.rpc.demo-client</module>
-        <module>rpc-common</module>
-        <module>rpc-io.daiwei.rpc.demo-common</module>
+        <module>rpc-demo-server</module>
+        <module>rpc-demo-client</module>
+        <module>rpc-demo-common</module>
     </modules>
     <packaging>pom</packaging>
 

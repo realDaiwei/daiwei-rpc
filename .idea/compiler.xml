@@ -2,6 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -19,6 +20,13 @@
       <module name="rpc-io.daiwei.rpc.demo-client" target="8" />
       <module name="rpc-io.daiwei.rpc.demo-server" target="8" />
       <module name="rpc-server" target="8" />
+      <module name="rpc-spring" target="8" />
+      <module name="rpc-springboot-starter" target="8" />
+      <module name="rpc-test" target="8" />
+      <module name="rpc-test-demo" target="8" />
+      <module name="rpc-test-entity" target="8" />
+      <module name="rpc-test-spring-demo" target="8" />
+      <module name="rpc-test-springboot" target="8" />
     </bytecodeTargetLevel>
   </component>
 </project>

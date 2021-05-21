@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<xsd:schema xmlns="https://spring.daiwei.io/schema/rpc"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="https://spring.daiwei.io/schema/rpc"
+>
+
+    <xsd:complexType name="Provider">
+        <xsd:attribute name="id" type="xsd:string" use="required"/>
+        <xsd:attribute name="register-conn" type="xsd:string" use="required"/>
+        <xsd:attribute name="service-package-path" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="Consumer">
+        <xsd:attribute name="id" type="xsd:string" use="required"/>
+        <xsd:attribute name="register-conn" type="xsd:string" use="required"/>
+    </xsd:complexType>
+
+    <xsd:element name="provider" type="Provider"/>
+
+    <xsd:element name="consumer" type="Consumer"/>
+
+</xsd:schema>
