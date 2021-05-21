@@ -8,3 +8,4 @@ spring:
         scan-package-path: io.daiwei.rpc.test.service.impl
 server:
   port: 8081
+

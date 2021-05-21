@@ -3,9 +3,10 @@ package io.daiwei.rpc.stub.invoker.component;
 import io.daiwei.rpc.serializer.RpcSerializer;
 import io.daiwei.rpc.stub.net.Client;
 import io.daiwei.rpc.stub.net.common.ClientInvokerCore;
+import io.daiwei.rpc.stub.net.common.ConnectServer;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 调用单元
@@ -38,4 +39,11 @@ public class InvokerUnit {
         return this.clientCore.getClient(addr);
     }
 
+    public ClientInvokerCore getClientCore() {
+        return this.clientCore;
+    }
+
+    public List<String> filterSubHealth(List<String> urls) {
+        return this.clientCore.removeSubHealthUrl(urls);
+    }
 }

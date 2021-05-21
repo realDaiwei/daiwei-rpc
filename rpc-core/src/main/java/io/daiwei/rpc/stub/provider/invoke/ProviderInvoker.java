@@ -1,6 +1,7 @@
 package io.daiwei.rpc.stub.provider.invoke;
 
 import io.daiwei.rpc.exception.DaiweiRpcException;
+import io.daiwei.rpc.stub.net.NetConstant;
 import io.daiwei.rpc.stub.net.common.ProviderInvokerCore;
 import io.daiwei.rpc.stub.net.params.RpcRequest;
 import io.daiwei.rpc.stub.net.params.RpcResponse;
@@ -25,7 +26,7 @@ public class ProviderInvoker extends ProviderInvokerCore {
     }
 
     @Override
-    public void requestComingBellRing(RpcRequest request) {
+    public RpcResponse requestComingBellRing(RpcRequest request) {
         RpcResponse.RpcResponseBuilder builder = RpcResponse.builder().requestId(request.getRequestId());
         try {
             Object res = invoke(request);
@@ -34,15 +35,15 @@ public class ProviderInvoker extends ProviderInvokerCore {
             builder.data(null).code(-1).msg(exception.getMessage()).exception(exception);
             exception.printStackTrace();
         }
-        RpcResponse resp = builder.build();
-        this.sendable.sendAsync(resp);
+        return builder.build();
     }
 
     @Override
     public boolean valid(RpcRequest req) {
-        return req.getCreateTimeMillis() + REQ_TIME_OUT >= System.currentTimeMillis() && req.getRequestId() != null
+        return  (req.getRequestId().startsWith(NetConstant.HEART_BEAT_REQ_ID) || req.getRequestId().startsWith(NetConstant.IDLE_CHANNEL_CLOSE_REQ_ID))
+                || (req.getCreateTimeMillis() + req.getTimeout() >= System.currentTimeMillis() && req.getRequestId() != null
                 && req.getRequestId().length() != 0 && req.getClassName() != null && req.getClassName().length() != 0
                 && req.getMethodName() != null && req.getMethodName().length() != 0 && req.getClassType() != null
-                && req.getParams() != null ;
+                && req.getParams() != null);
     }
 }

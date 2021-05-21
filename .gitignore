@@ -5,7 +5,6 @@
 *.iml
 */target
 .idea
-.gitidea
 # Log file
 *.log
 

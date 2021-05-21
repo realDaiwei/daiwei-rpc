@@ -22,16 +22,24 @@ public class NettyServerHub implements Server {
     public NettyServerHub(int port, ProviderInvokerCore invokerCore, RpcSerializer serializer) {
         this.nettyServer = new NettyServer(port, serializer);
         this.invokerCore = invokerCore;
-        invokerCore.setSendable(this.nettyServer);
     }
 
     @Override
     public void start() {
         if (!this.nettyServer.isValid() && this.invokerCore != null) {
-            new Thread(() -> {
-                this.nettyServer.run(this.invokerCore);
-            }, "daiwei-rpc-server-thread").start();
+            try {
+                new Thread(() -> {
+                    this.nettyServer.run(this.invokerCore);
+                }, "daiwei-rpc-server-thread").start();
+            } catch (Exception e) {
+                log.error("error!", e);
+            }
         }
+    }
+
+    @Override
+    public void stop() {
+        this.nettyServer.close();
     }
 
     @Override

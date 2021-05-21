@@ -5,6 +5,10 @@ spring:
         register-conn: 127.0.0.1:2181
       provider:
         register-conn: 127.0.0.1:2181
+<<<<<<< HEAD
         scan-package-path: io.daiwei.rpc.test.service.impl
 server:
   port: 8081
+=======
+        scan-package-path: io.daiwei.rpc.test.service.impl
+>>>>>>> main

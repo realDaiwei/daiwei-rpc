@@ -1,6 +1,5 @@
 package io.daiwei.rpc.stub.net;
 
-import io.daiwei.rpc.serializer.RpcSerializer;
 import io.daiwei.rpc.stub.net.params.RpcFutureResp;
 import io.daiwei.rpc.stub.net.params.RpcRequest;
 
@@ -10,7 +9,7 @@ import io.daiwei.rpc.stub.net.params.RpcRequest;
  */
 public interface Client {
 
-    RpcFutureResp sendAsync(RpcRequest request);
+    RpcFutureResp send(RpcRequest request);
 
     void cleanAfterInvoke(RpcRequest request);
 }

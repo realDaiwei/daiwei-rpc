@@ -15,29 +15,20 @@ import java.io.IOException;
 public class HessianSerializer implements RpcSerializer {
 
     @Override
-    public <T> byte[] serialize(T obj) {
+    public <T> byte[] serialize(T obj) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Hessian2Output output = new Hessian2Output(outputStream);
-        try {
-            output.writeObject(obj);
-            output.flush();
-            return outputStream.toByteArray();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+        output.writeObject(obj);
+        output.flush();
+        return outputStream.toByteArray();
+
     }
 
     @Override
-    public <T> T deserialize(byte[] bytes, Class<T> clazz) {
+    public <T> T deserialize(byte[] bytes, Class<T> clazz) throws IOException {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes);
         Hessian2Input hessian2Input = new Hessian2Input(inputStream);
-        try {
-            Object obj = hessian2Input.readObject();
-            return clazz.cast(obj);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+        Object obj = hessian2Input.readObject();
+        return clazz.cast(obj);
     }
 }

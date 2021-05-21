@@ -1,7 +1,6 @@
 package io.daiwei.rpc.stub.net.server;
 
 import io.daiwei.rpc.serializer.RpcSerializer;
-import io.daiwei.rpc.stub.common.RpcSendable;
 import io.daiwei.rpc.stub.net.codec.NettyDecoder;
 import io.daiwei.rpc.stub.net.codec.NettyEncoder;
 import io.daiwei.rpc.stub.net.common.ProviderInvokerCore;
@@ -11,7 +10,6 @@ import io.daiwei.rpc.stub.provider.invoke.RpcProviderProxyPool;
 import io.daiwei.rpc.util.ThreadPoolUtil;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
-import io.netty.channel.epoll.EpollChannelOption;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -20,15 +18,15 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 真正的 netty Server
  * Created by Daiwei on 2021/4/13
  */
 @Slf4j
-public class NettyServer implements RpcSendable {
+public class NettyServer {
 
     private final int port;
 
@@ -36,19 +34,19 @@ public class NettyServer implements RpcSendable {
 
     private final ChannelGroup channels;
 
-    private final Map<String, ChannelId> reqChannelIdMap;
-
     private EventLoopGroup bossGroup;
 
     private EventLoopGroup workerGroup;
 
     private ChannelFuture channelFuture;
 
+    private final AtomicInteger globalReqNums;
+
     public NettyServer(Integer port, RpcSerializer serializer) {
         this.port = port;
         this.serializer = serializer;
-        this.reqChannelIdMap = new ConcurrentHashMap<>();
         this.channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+        this.globalReqNums = new AtomicInteger();
     }
 
     /**
@@ -63,9 +61,7 @@ public class NettyServer implements RpcSendable {
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.option(ChannelOption.SO_BACKLOG, 128)
                     .option(ChannelOption.SO_REUSEADDR, true)
-                    .option(ChannelOption.TCP_NODELAY, true)
                     .option(ChannelOption.SO_RCVBUF, 32 * 1024)
-                    .option(EpollChannelOption.SO_REUSEPORT, true)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
             serverBootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
@@ -73,11 +69,12 @@ public class NettyServer implements RpcSendable {
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ch.pipeline().addLast(new NettyDecoder(RpcRequest.class, serializer))
                                     .addLast(new NettyEncoder(RpcResponse.class, serializer))
-                                    .addLast(new ServerHandler(invokerCore, channels, reqChannelIdMap));
+                                    .addLast(new ServerHandler(invokerCore, channels, globalReqNums));
                         }
                     });
             channelFuture = serverBootstrap.bind(this.port).sync();
-            log.debug("daiwei-rpc server afterSetProperties successfully and listen for port "+ this.port);
+            log.info("daiwei-rpc server start successfully and listen for port "+ this.port);
+            ServerHandler.serverHandlerOpen();
             channelFuture.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -89,38 +86,33 @@ public class NettyServer implements RpcSendable {
 
     /**
      * 关闭 netty Server
+     * 如果当前server 中存在正在处理的请求，延迟 10 关闭
      */
     public void close() {
+        ServerHandler.serverHandlerClose();
+        if (this.globalReqNums.get() > 0) {
+            try {
+                TimeUnit.SECONDS.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        this.channels.close();
+        ThreadPoolUtil.shutdownExistsPools();
+        RpcProviderProxyPool.getInstance().cleanPool();
         if (bossGroup != null) {
             this.bossGroup.shutdownGracefully();
         }
         if (workerGroup != null) {
             this.workerGroup.shutdownGracefully();
         }
-        ThreadPoolUtil.shutdownExistsPools();
-        RpcProviderProxyPool.getInstance().cleanPool();
-        log.debug("netty server of rpc is offline");
+        log.info("[daiwei-rpc] netty server of rpc is offline");
     }
 
     public boolean isValid() {
         return this.channelFuture != null && this.channelFuture.channel().isActive();
     }
 
-    /**
-     * 发送数据给客户端
-     * @param obj
-     */
-    public void sendAsync(Object obj) {
-        try {
-            ThreadPoolUtil.defaultRpcProviderExecutor().execute(() ->{
-                RpcResponse response = (RpcResponse) obj;
-                channels.find(this.reqChannelIdMap.get(response.getRequestId())).writeAndFlush(response);
-                reqChannelIdMap.remove(response.getRequestId());
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     @Override
     public String toString() {

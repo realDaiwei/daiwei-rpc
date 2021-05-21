@@ -11,9 +11,9 @@ import java.util.concurrent.*;
  */
 public class ThreadPoolUtil {
 
-    private static final int CORE_SIZE = 4;
+    private static final int CORE_SIZE = 20;
 
-    private static final int MAX_SIZE = Runtime.getRuntime().availableProcessors();
+    private static final int MAX_SIZE = 40;
 
     private static final long KEEP_ALIVE_TIME = 60;
 
@@ -29,7 +29,11 @@ public class ThreadPoolUtil {
 
     public static ExecutorService createPool(String poolName) {
         ThreadPoolExecutor poolExecutor = new ThreadPoolExecutor(CORE_SIZE, MAX_SIZE, KEEP_ALIVE_TIME, TimeUnit.SECONDS,
-                new ArrayBlockingQueue<>(QUEUE_CAPACITY), r -> new Thread(r, poolName + "-worker"), (r, executor) -> {
+                new ArrayBlockingQueue<>(QUEUE_CAPACITY), r -> {
+                    Thread thread = new Thread(r, poolName + "-worker");
+                    thread.setUncaughtExceptionHandler((t, e) -> e.printStackTrace());
+                    return thread;
+                }, (r, executor) -> {
             throw new DaiweiRpcException("thread pool[" + poolName + "] is exhausted.");
         });
         EXECUTOR_POOLS.add(poolExecutor);
