@@ -65,6 +65,7 @@ public class DelegateInvokerMethod {
         try {
             while (rpcResponse == null || rpcResponse.getException() != null) {
                 String url = loadBalance.select(healthUrls, this.urls);
+                System.out.println(url);
                 client = invokerUnit.getInvokeClient(url);
                 String requestId = UUID.randomUUID().toString().replace("-", "");
                 request.setRequestId(requestId);

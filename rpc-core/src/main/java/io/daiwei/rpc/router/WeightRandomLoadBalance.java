@@ -32,6 +32,7 @@ public class WeightRandomLoadBalance extends LoadBalance {
             throw new DaiweiRpcException("no available server url");
         }
         List<String> weightList = getWeightList(urls);
+        System.out.println(Arrays.toString(weightList.toArray()));
         return weightList.get(rnd.nextInt(weightList.size()));
     }
 

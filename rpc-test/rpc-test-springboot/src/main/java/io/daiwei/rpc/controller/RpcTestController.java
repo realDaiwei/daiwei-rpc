@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/rpc")
 public class RpcTestController {
 
-    @RpcRef(routerClass = DefaultRouter.class, version = "1.0")
+    @RpcRef(routerClass = DefaultRouter.class)
     private UserService userService;
 
     @GetMapping("/user")

@@ -6,6 +6,8 @@ import io.daiwei.rpc.service.OrderService;
 import io.daiwei.rpc.service.UserService;
 import io.daiwei.rpc.stub.invoker.factory.RpcInvokerFactory;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by Daiwei on 2021/4/11
  */
@@ -19,7 +21,7 @@ public class TestAppMain {
 //        UserService stub = (UserService) factory.createStub(rpcRefBean);
 //        long start = System.currentTimeMillis();
         RpcInvokerFactory factory = new RpcInvokerFactory("127.0.0.1:2181");
-        UserService userService = factory.createStubByClass(UserService.class, "1.0");
+        UserService userService = factory.createStubByClass(UserService.class, null);
 //        for (int i = 0; i < 100000; i++) {
 //            User user = userService.findByUser(10L);
 //            System.out.println(user);
@@ -34,11 +36,12 @@ public class TestAppMain {
 //            System.out.println(user);
 //        }
 //        System.out.println(System.currentTimeMillis() - start);
-        Thread.sleep(30 * 1000);
+//        Thread.sleep(30 * 1000);
 //        start = System.currentTimeMillis();
 //        UserServiceImpl userService  = new UserServiceImpl();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             User user = userService.findByUser(10L);
+            TimeUnit.SECONDS.sleep(1);
             System.out.println(user);
         }
 //        System.out.println(System.currentTimeMillis() - start);
